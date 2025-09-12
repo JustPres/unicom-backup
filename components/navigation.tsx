@@ -1,0 +1,199 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Menu, User, LogOut, Settings } from "lucide-react"
+import { useAuth } from "@/lib/auth"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+
+export function Navigation() {
+  const [isOpen, setIsOpen] = useState(false)
+  const { user, logout } = useAuth()
+
+  const getNavItems = () => {
+    if (!user) {
+      // Visitor navigation
+      return [
+        { href: "/", label: "Home" },
+        { href: "/catalog", label: "Catalog" },
+        { href: "/services", label: "Services" },
+        { href: "/support", label: "Support" },
+        { href: "/about", label: "About" },
+      ]
+    } else if (user.role === "customer") {
+      // Customer navigation
+      return [
+        { href: "/customer/home", label: "Home" },
+        { href: "/catalog", label: "Catalog" },
+        { href: "/quote", label: "Get Quote" },
+        { href: "/customer/quotes", label: "My Quotes" },
+        { href: "/support", label: "Support" },
+      ]
+    } else {
+      // Admin navigation
+      return [
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/catalog", label: "Catalog" },
+        { href: "/quotes", label: "Quotes" },
+        { href: "/analytics", label: "Analytics" },
+        { href: "/inventory", label: "Inventory" },
+      ]
+    }
+  }
+
+  const navItems = getNavItems()
+
+  const handleLogout = () => {
+    console.log("[v0] Logout button clicked")
+    logout()
+    window.location.href = "/"
+  }
+
+  console.log("[v0] Navigation render - user:", user)
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Logo */}
+        <Link
+          href={user ? (user.role === "customer" ? "/customer/home" : "/dashboard") : "/"}
+          className="flex items-center space-x-2"
+        >
+          {user?.role !== "customer" && (
+            <>
+              <div className="h-8 w-8 rounded bg-emerald-600 flex items-center justify-center">
+                <span className="text-white font-bold text-sm">U</span>
+              </div>
+              <div>
+                <span className="font-bold text-lg">Unicom</span>
+                <span className="text-sm text-muted-foreground ml-1">Technologies</span>
+              </div>
+            </>
+          )}
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-sm font-medium transition-colors hover:text-emerald-600"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Auth Section */}
+        <div className="flex items-center space-x-4">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-emerald-100 text-emerald-600">
+                      {user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user.name}</p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">{user.email}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="hidden md:flex items-center space-x-2">
+              <Button variant="ghost" asChild>
+                <Link href="/login">Customer Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Sign Up</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/admin/login" className="text-xs">
+                  Admin
+                </Link>
+              </Button>
+            </div>
+          )}
+
+          {/* Mobile Menu */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <nav className="flex flex-col space-y-4">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm font-medium transition-colors hover:text-emerald-600"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {!user && (
+                  <div className="flex flex-col space-y-2 pt-4">
+                    <Button variant="ghost" asChild>
+                      <Link href="/login" onClick={() => setIsOpen(false)}>
+                        Customer Login
+                      </Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/register" onClick={() => setIsOpen(false)}>
+                        Sign Up
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href="/admin/login" onClick={() => setIsOpen(false)}>
+                        Admin Portal
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
+  )
+}
