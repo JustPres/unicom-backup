@@ -36,7 +36,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
 
       <main className="container mx-auto py-8 px-4">
         <div className="mb-8">
@@ -133,6 +133,7 @@ function AdminDashboard() {
 }
 
 function CustomerDashboard() {
+  const { user, logout } = useAuth()
   const [quotes, setQuotes] = useState<any[]>([])
   const [quotesLoading, setQuotesLoading] = useState(true)
 
@@ -192,25 +193,22 @@ function CustomerDashboard() {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>What would you like to do?</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Button className="h-20 flex-col space-y-2">
-              <ShoppingCart className="h-6 w-6" />
-              <span>Browse Catalog</span>
-            </Button>
-            <Button variant="outline" className="h-20 flex-col space-y-2 bg-transparent">
-              <Package className="h-6 w-6" />
-              <span>Track Orders</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      
+
+      {/* Account actions */}
+      <div className="pt-8 text-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+          onClick={() => {
+            logout()
+            window.location.href = "/"
+          }}
+        >
+          Log out
+        </Button>
+      </div>
     </div>
   )
 }

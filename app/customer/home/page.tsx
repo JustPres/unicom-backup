@@ -9,9 +9,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, TrendingUp, Star, Clock } from "lucide-react"
 import { products, categories } from "@/lib/products"
 import Link from "next/link"
+import { useAuth } from "@/lib/auth"
 
 export default function CustomerHomePage() {
   const [searchQuery, setSearchQuery] = useState("")
+  const { logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    window.location.href = "/"
+  }
 
   // Get featured products (first 6)
   const featuredProducts = products.slice(0, 6)
@@ -118,6 +125,13 @@ export default function CustomerHomePage() {
               </Card>
             ))}
           </div>
+        </div>
+
+        {/* Account actions (subtle) */}
+        <div className="mt-12 text-center">
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleLogout}>
+            Log out
+          </Button>
         </div>
       </main>
     </div>
