@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wrench, Monitor, Wifi, HardDrive, Shield, Headphones } from "lucide-react"
+import { VisitorHeader } from "@/components/visitor-header"
 
 export default function ServicesPage() {
   const services = [
@@ -43,7 +44,9 @@ export default function ServicesPage() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <VisitorHeader />
+      <main className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 text-balance">Our Services</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
@@ -89,6 +92,7 @@ export default function ServicesPage() {
           </CardContent>
         </Card>
       </div>
+      </main>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Navigation } from "@/components/navigation"
+import { VisitorHeader } from "@/components/visitor-header"
 import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -41,7 +41,7 @@ export default function CatalogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <VisitorHeader />
 
       <main className="container mx-auto py-8 px-4">
         {/* Header */}

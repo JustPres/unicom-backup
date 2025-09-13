@@ -4,10 +4,13 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Phone, Mail, MapPin, Clock, MessageCircle, FileText } from "lucide-react"
+import { VisitorHeader } from "@/components/visitor-header"
 
 export default function SupportPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <VisitorHeader />
+      <main className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 text-balance">Technical Support</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
@@ -149,6 +152,7 @@ export default function SupportPage() {
           </div>
         </CardContent>
       </Card>
+      </main>
     </div>
   )
 }

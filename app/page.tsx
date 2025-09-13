@@ -18,16 +18,19 @@ export default function HomePage() {
               <h1 className="text-xl font-bold text-foreground">Unicom Technologies</h1>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/catalog" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/" className="text-sm text-emerald-600 transition-colors">
+                Home
+              </Link>
+              <Link href="/catalog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Catalog
               </Link>
-              <Link href="/services" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/services" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Services
               </Link>
-              <Link href="/support" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/support" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Support
               </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 About
               </Link>
             </nav>

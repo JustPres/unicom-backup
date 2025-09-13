@@ -22,6 +22,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Phasing
+PHASING.txt
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

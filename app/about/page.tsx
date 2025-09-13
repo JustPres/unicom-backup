@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Users, Award, Clock, MapPin, Target, Heart } from "lucide-react"
+import { VisitorHeader } from "@/components/visitor-header"
 
 export default function AboutPage() {
   const stats = [
@@ -29,7 +30,9 @@ export default function AboutPage() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <VisitorHeader />
+      <main className="container mx-auto px-4 py-8">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 text-balance">About Unicom Technologies</h1>
@@ -145,6 +148,7 @@ export default function AboutPage() {
           </div>
         </CardContent>
       </Card>
+      </main>
     </div>
   )
 }
