@@ -2,7 +2,8 @@
 
 import { useAuth } from "@/lib/auth"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -132,31 +133,62 @@ function AdminDashboard() {
 }
 
 function CustomerDashboard() {
+  const [quotes, setQuotes] = useState<any[]>([])
+  const [quotesLoading, setQuotesLoading] = useState(true)
+
+  useEffect(() => {
+    fetchRecentQuotes()
+  }, [])
+
+  const fetchRecentQuotes = async () => {
+    try {
+      const response = await fetch(`/api/quotes?customerEmail=${encodeURIComponent(user?.email || "")}`)
+      if (response.ok) {
+        const data = await response.json()
+        setQuotes(data.quotes.slice(0, 3)) // Get only recent 3
+      }
+    } catch (error) {
+      console.error("Error fetching quotes:", error)
+    } finally {
+      setQuotesLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-8">
-      {/* Recent Orders */}
+      {/* Recent Quotes */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-          <CardDescription>Track your recent purchases</CardDescription>
+          <CardTitle>Recent Quote Requests</CardTitle>
+          <CardDescription>Track your recent quote requests</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium">Order #12345</p>
-                <p className="text-sm text-muted-foreground">Gaming Keyboard + Mouse Set</p>
-              </div>
-              <Badge>Delivered</Badge>
+          {quotesLoading ? (
+            <div className="text-center py-4">Loading...</div>
+          ) : quotes.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No quote requests yet.</p>
+              <Button asChild className="mt-4">
+                <Link href="/quote">Request Your First Quote</Link>
+              </Button>
             </div>
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium">Order #12344</p>
-                <p className="text-sm text-muted-foreground">USB-C Hub</p>
-              </div>
-              <Badge variant="secondary">Processing</Badge>
+          ) : (
+            <div className="space-y-4">
+              {quotes.map((quote) => (
+                <div key={quote.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Quote #{quote.id.slice(0, 8)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {quote.items.length} items • ${quote.totalAmount.toLocaleString()}
+                    </p>
+                  </div>
+                  <Badge variant={quote.status === "approved" ? "default" : "secondary"}>
+                    {quote.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 

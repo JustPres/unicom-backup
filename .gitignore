@@ -25,3 +25,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.vercel
+
+#mongo db password
+.x5MbTC4GFTcBfB9
+

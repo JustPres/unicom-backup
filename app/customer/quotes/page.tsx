@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, Eye, CheckCircle, XCircle, Clock, FileText, Plus } from "lucide-react"
-import { quotes } from "@/lib/quotes"
 import type { Quote } from "@/lib/quotes"
 import Link from "next/link"
 
@@ -18,6 +17,8 @@ export default function CustomerQuotesPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
+  const [quotes, setQuotes] = useState<Quote[]>([])
+  const [quotesLoading, setQuotesLoading] = useState(true)
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "customer")) {
@@ -25,7 +26,27 @@ export default function CustomerQuotesPage() {
     }
   }, [user, loading, router])
 
-  const customerQuotes = quotes.filter((quote) => user && quote.customerEmail === user.email)
+  useEffect(() => {
+    if (user && user.role === "customer") {
+      fetchQuotes()
+    }
+  }, [user])
+
+  const fetchQuotes = async () => {
+    try {
+      const response = await fetch(`/api/quotes?customerEmail=${encodeURIComponent(user?.email || "")}`)
+      if (response.ok) {
+        const data = await response.json()
+        setQuotes(data.quotes)
+      }
+    } catch (error) {
+      console.error("Error fetching quotes:", error)
+    } finally {
+      setQuotesLoading(false)
+    }
+  }
+
+  const customerQuotes = quotes
 
   const filteredQuotes = customerQuotes.filter(
     (quote) =>
@@ -61,7 +82,7 @@ export default function CustomerQuotesPage() {
     }
   }
 
-  if (loading) {
+  if (loading || quotesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>

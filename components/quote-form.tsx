@@ -68,23 +68,37 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const response = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: customerInfo.name,
+          customerEmail: customerInfo.email,
+          company: customerInfo.company,
+          phone: customerInfo.phone,
+          items,
+          notes,
+        }),
+      })
 
-    const quoteData = {
-      customerInfo,
-      items,
-      notes,
-      totalAmount: calculateTotal(),
+      if (!response.ok) {
+        throw new Error("Failed to submit quote")
+      }
+
+      const data = await response.json()
+      onSubmit?.(data.quote)
+    } catch (error) {
+      console.error("Error submitting quote:", error)
+      // You might want to show an error message to the user
+    } finally {
+      setIsSubmitting(false)
+
+      // Reset form
+      setCustomerInfo({ name: "", email: "", company: "", phone: "" })
+      setItems([])
+      setNotes("")
     }
-
-    onSubmit?.(quoteData)
-    setIsSubmitting(false)
-
-    // Reset form
-    setCustomerInfo({ name: "", email: "", company: "", phone: "" })
-    setItems([])
-    setNotes("")
   }
 
   return (
@@ -160,7 +174,13 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
               <div key={index} className="p-4 border rounded-lg space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Item {index + 1}</h4>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(index)}>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeItem(index)}
+                    title="Remove this item"
+                  >
                     <Minus className="h-4 w-4" />
                   </Button>
                 </div>

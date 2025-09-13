@@ -39,72 +39,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    console.log("[v0] Login function called with:", { email, password })
     setLoading(true)
-
-    // Simulate API call - replace with real authentication
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const demoUsers: Array<{ id: string; email: string; password: string; name: string; role: "admin" | "customer" }> =
-      [
-        {
-          id: "admin-1",
-          email: "admin@unicom.com",
-          password: "admin123",
-          name: "Admin User",
-          role: "admin",
-        },
-      ]
-
-    const foundUser = demoUsers.find((u) => u.email === email && u.password === password)
-    console.log("[v0] Found user:", foundUser)
-
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser
-      console.log("[v0] Setting user:", userWithoutPassword)
-      setUser(userWithoutPassword)
-
-      try {
-        localStorage.setItem("unicom_user", JSON.stringify(userWithoutPassword))
-        console.log("[v0] User saved to localStorage")
-      } catch (error) {
-        console.log("[v0] Error saving to localStorage:", error)
-      }
-
-      setLoading(false)
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) return false
+      const data = await res.json()
+      setUser(data.user)
+      localStorage.setItem("unicom_user", JSON.stringify(data.user))
       return true
+    } catch (e) {
+      return false
+    } finally {
+      setLoading(false)
     }
-
-    console.log("[v0] Login failed - user not found")
-    setLoading(false)
-    return false
   }
 
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
-    console.log("[v0] Register function called")
     setLoading(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const newUser = {
-      id: Date.now().toString(),
-      email,
-      name,
-      role: "customer" as const,
-    }
-
-    setUser(newUser)
-
     try {
-      localStorage.setItem("unicom_user", JSON.stringify(newUser))
-      console.log("[v0] New user registered and saved")
-    } catch (error) {
-      console.log("[v0] Error saving new user:", error)
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name }),
+      })
+      if (!res.ok) return false
+      const data = await res.json()
+      setUser(data.user)
+      localStorage.setItem("unicom_user", JSON.stringify(data.user))
+      return true
+    } catch (e) {
+      return false
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
-    return true
   }
 
   const logout = () => {

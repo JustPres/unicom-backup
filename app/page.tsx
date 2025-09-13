@@ -43,11 +43,6 @@ export default function HomePage() {
                   Register
                 </Button>
               </Link>
-              <Link href="/admin/login">
-                <Button variant="ghost" size="sm" className="text-xs">
-                  Admin
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
