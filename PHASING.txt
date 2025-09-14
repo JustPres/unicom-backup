@@ -1,0 +1,83 @@
+Phase 0 — Project Setup and Baseline
+- Requirements:
+  - Initialize Next.js 14 (App Router) project with TypeScript and Tailwind CSS.
+  - Add Shadcn/Radix UI primitives and base UI components under `components/ui/`.
+  - Establish authentication context (`lib/auth.tsx`) with localStorage persistence and role support (customer/admin).
+  - Scaffold core pages and routes:
+    - Visitor pages: Home (`app/page.tsx`), Catalog (`app/catalog/page.tsx`), Services (`app/services/page.tsx`), Support (`app/support/page.tsx`), About (`app/about/page.tsx`).
+    - Customer: Dashboard (`app/dashboard/page.tsx`), Customer Home (`app/customer/home/page.tsx`), Quotes (`app/customer/quotes/`).
+    - API routes scaffold: `app/api/*` (auth, quotes).
+  - Configure build tooling (PostCSS, Tailwind, tsconfig, next.config.mjs) and package manager (pnpm).
+  - Set up Vercel project and initial production deployment.
+
+
+Phase 1 — Navigation and Profile Menu Fixes
+- Requirements:
+  - Fix customer profile dropdown (Dashboard/Logout not appearing) in `components/navigation.tsx`.
+    - Correct JSX structure, z-index, spacing, focus outlines, and event handling.
+    - Ensure nullable user data access is safe (e.g., `user?.name`).
+  - Clean mobile menu JSX to remove duplicate/broken blocks.
+  - Verify `components/ui/dropdown-menu.tsx` props usage (side, align, sideOffset) for correct positioning.
+  - Deploy to production and verify dropdown works.
+
+
+Phase 2 — Customer UX Adjustments to Navigation
+- Requirements:
+  - Add “Dashboard” to customer main navigation (after “Support”).
+  - Remove “Dashboard” and “Log out” from the customer profile dropdown; keep only “Profile”.
+  - Move “Log out” for customers to the dashboard page (subtle button) to reduce visibility.
+  - Ensure Dashboard link points to `/dashboard` (not `/customer/home`).
+  - Implement active-link highlighting in `components/navigation.tsx` using `usePathname` for desktop and mobile nav.
+  - Special-case: highlight Dashboard when on `/customer/home` to emphasize post-login state.
+  - Deploy and verify.
+
+
+Phase 3 — Dashboard Layout and Navbar Behavior
+- Requirements:
+  - Remove “Quick Actions” section from Customer Dashboard.
+  - Center the navbar for Dashboard view via `Navigation` prop: `centered` (hides logo/auth on that page, centers links).
+  - Replace top-right avatar for customers with non-clickable “Welcome, [name]” text; keep admin dropdown unchanged.
+  - Ensure customer dashboard includes a subtle logout button at the bottom (uses `useAuth().logout`).
+  - Fix any JSX lint/balance issues in `components/navigation.tsx` and restore the mobile sheet where needed.
+  - Deploy and verify.
+
+
+Phase 4 — Chatbot Revamp (Local Intents + UI)
+- Requirements:
+  - Redesign `components/chatbot.tsx` to a right-side drawer (Sheet) with:
+    - Larger responsive panel; better message bubbles with timestamps.
+    - Typing indicator; quick suggestion chips; multiline input (Enter to send, Shift+Enter newline).
+    - Quick links under input (Catalog, Get Quote, Support).
+  - Implement local intent handling (no external LLM):
+    - Navigation intents: dashboard, catalog, quote, my quotes, support.
+    - Product lookup intents: “search <term>” / “find <term>” using `lib/products.ts::searchProducts`.
+  - Add simple FAQ knowledge base:
+    - Create `lib/faq.ts` with keyword matcher `getFaqAnswer(query)`; integrate into chatbot fallback flow.
+  - Render product search results as mini cards in chat (name, brand, stock; link to Catalog).
+  - Persist chat history via localStorage and restore on reload.
+  - Deploy and verify.
+
+
+Phase 5 — Visitor Navbar Standardization and UX Polishing
+- Requirements:
+  - Create `components/visitor-header.tsx` (Client Component) replicating homepage header style.
+    - Include links: Home, Catalog, Services, Support, About.
+    - Use `usePathname` to highlight active link (green) and preserve hover behavior.
+  - Apply `VisitorHeader` to visitor pages:
+    - Catalog (`app/catalog/page.tsx`), Services (`app/services/page.tsx`), Support (`app/support/page.tsx`), About (`app/about/page.tsx`).
+    - Mark `visitor-header.tsx` with "use client" to support `usePathname`.
+  - Update homepage header (`app/page.tsx`):
+    - Add “Home” link; keep font sizes consistent with other pages (`text-sm`).
+    - Highlight “Home” on `/`.
+  - Confirm consistent navbar across all visitor pages; ensure no font-size regression.
+  - Deploy and verify production.
+
+
+Notes & Next Candidates (Post-Phase 5)
+- Optional:
+  - Add hamburger mobile menu to `VisitorHeader` (Sheet) mirroring authenticated nav.
+  - Seed sample products in `lib/products.ts` to showcase catalog/search/compare flows.
+  - Add “Clear chat” button to chatbot to reset localStorage.
+  - Connect real database (MongoDB/Vercel KV/Postgres) and wire quotes/products APIs.
+  - Enable Vercel Analytics and basic uptime monitoring.
+ 

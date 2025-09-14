@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Plus, Minus, Send, Calculator } from "lucide-react"
-import { products } from "@/lib/products"
+import { fetchProducts, type Product } from "@/lib/products"
 import type { QuoteItem } from "@/lib/quotes"
 
 interface QuoteFormProps {
@@ -28,6 +28,19 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
   const [items, setItems] = useState<QuoteItem[]>([])
   const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const list = await fetchProducts()
+        setProducts(list)
+      } catch (e) {
+        // optional: toast error
+      }
+    }
+    void load()
+  }, [])
 
   const addItem = () => {
     const newItem: QuoteItem = {

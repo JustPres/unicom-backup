@@ -1,13 +1,16 @@
-import { notFound } from "next/navigation"
+"use client"
+
 import Image from "next/image"
+import { useEffect, useState } from "react"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Star, ShoppingCart, Heart, Share2, ArrowLeft } from "lucide-react"
-import { getProductById } from "@/lib/products"
+import { getProductById, type Product } from "@/lib/products"
 import Link from "next/link"
+import { useAuth } from "@/lib/auth"
 
 interface ProductPageProps {
   params: {
@@ -16,15 +19,29 @@ interface ProductPageProps {
 }
 
 export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductById(params.id)
+  const { user } = useAuth()
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  if (!product) {
-    notFound()
-  }
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const p = await getProductById(params.id)
+        if (!cancelled) setProduct(p ?? null)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [params.id])
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      {user ? (user.role === "admin" ? <Navigation centered /> : <Navigation />) : <Navigation />}
 
       <main className="container mx-auto py-8 px-4">
         {/* Breadcrumb */}
@@ -37,82 +54,93 @@ export default function ProductPage({ params }: ProductPageProps) {
           </Button>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Product Image */}
-          <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden rounded-lg border">
-              <Image
-                src={product.image || "/placeholder.svg"}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {!product.inStock && (
-                <Badge variant="destructive" className="absolute top-4 right-4">
-                  Out of Stock
-                </Badge>
-              )}
+        {loading ? (
+          <div className="py-12 text-center">Loading product…</div>
+        ) : !product ? (
+          <Card className="text-center py-12">
+            <CardContent>
+              <h2 className="text-2xl font-bold mb-2">Product not found</h2>
+              <p className="text-muted-foreground">The product you are looking for does not exist.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-8 lg:grid-cols-2">
+            {/* Product Image */}
+            <div className="space-y-4">
+              <div className="relative aspect-square overflow-hidden rounded-lg border">
+                <Image
+                  src={product.image || "/placeholder.svg"}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                {!product.inStock && (
+                  <Badge variant="destructive" className="absolute top-4 right-4">
+                    Out of Stock
+                  </Badge>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Product Details */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{product.brand}</span>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium">{product.rating}</span>
-                  <span className="text-muted-foreground">({product.reviews} reviews)</span>
+            {/* Product Details */}
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">{product.brand}</span>
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-medium">{product.rating}</span>
+                    <span className="text-muted-foreground">({product.reviews} reviews)</span>
+                  </div>
+                </div>
+
+                <h1 className="text-3xl font-bold text-balance mb-4">{product.name}</h1>
+
+                <p className="text-lg text-muted-foreground mb-6">{product.description}</p>
+
+                <div className="flex items-center space-x-4 mb-6">
+                  <span className="text-4xl font-bold text-emerald-600">${product.price.toFixed(2)}</span>
+                  <Badge variant={product.inStock ? "default" : "destructive"}>
+                    {product.inStock ? "In Stock" : "Out of Stock"}
+                  </Badge>
                 </div>
               </div>
 
-              <h1 className="text-3xl font-bold text-balance mb-4">{product.name}</h1>
-
-              <p className="text-lg text-muted-foreground mb-6">{product.description}</p>
-
-              <div className="flex items-center space-x-4 mb-6">
-                <span className="text-4xl font-bold text-emerald-600">${product.price.toFixed(2)}</span>
-                <Badge variant={product.inStock ? "default" : "destructive"}>
-                  {product.inStock ? "In Stock" : "Out of Stock"}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex space-x-4">
-              <Button size="lg" className="flex-1" disabled={!product.inStock}>
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                Add to Cart
-              </Button>
-              <Button size="lg" variant="outline">
-                <Heart className="h-5 w-5" />
-              </Button>
-              <Button size="lg" variant="outline">
-                <Share2 className="h-5 w-5" />
-              </Button>
-            </div>
-
-            {/* Quick Quote */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Need a Custom Quote?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Get personalized pricing for bulk orders or custom configurations
-                </p>
-                <Button variant="outline" className="w-full bg-transparent">
-                  Request Quote
+              {/* Actions */}
+              <div className="flex space-x-4">
+                <Button size="lg" className="flex-1" disabled={!product.inStock}>
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Add to Cart
                 </Button>
-              </CardContent>
-            </Card>
+                <Button size="lg" variant="outline">
+                  <Heart className="h-5 w-5" />
+                </Button>
+                <Button size="lg" variant="outline">
+                  <Share2 className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Quick Quote */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Need a Custom Quote?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Get personalized pricing for bulk orders or custom configurations
+                  </p>
+                  <Button variant="outline" className="w-full bg-transparent">
+                    Request Quote
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Specifications */}
-        {product.specifications && (
+        {!loading && product?.specifications && Object.keys(product.specifications).length > 0 && (
           <div className="mt-12">
             <Card>
               <CardHeader>

@@ -110,7 +110,7 @@ export function Chatbot() {
     const searchMatch = lower.match(/^(search|find)\s+(.+)/)
     if (searchMatch) {
       const term = searchMatch[2]
-      const results = searchProducts(term).slice(0, 5)
+      const results = (await searchProducts(term)).slice(0, 5)
       if (results.length === 0) {
         pushMessage(`No results for "${term}". Try another keyword.`, true)
       } else {

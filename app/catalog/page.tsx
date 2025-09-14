@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { VisitorHeader } from "@/components/visitor-header"
+import { Navigation } from "@/components/navigation"
+import { useAuth } from "@/lib/auth"
 import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,20 +11,33 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Search, Grid, List, GitCompare, X } from "lucide-react"
-import { products, categories, searchProducts, getProductsByCategory } from "@/lib/products"
+import { categories, fetchProducts, type Product } from "@/lib/products"
 import Link from "next/link"
 
 export default function CatalogPage() {
+  const { user } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [compareProducts, setCompareProducts] = useState<string[]>([])
+  const [items, setItems] = useState<Product[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const filteredProducts = searchQuery
-    ? searchProducts(searchQuery)
-    : selectedCategory
-      ? getProductsByCategory(selectedCategory)
-      : products
+  const load = async () => {
+    setLoading(true)
+    try {
+      const list = await fetchProducts({ q: searchQuery || undefined, category: selectedCategory || undefined })
+      setItems(list)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // load when query or category changes
+  useEffect(() => {
+    void load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedCategory])
 
   const handleCompareToggle = (productId: string) => {
     setCompareProducts((prev) => {
@@ -35,13 +50,11 @@ export default function CatalogPage() {
     })
   }
 
-  const getComparedProducts = () => {
-    return products.filter((p) => compareProducts.includes(p.id))
-  }
+  const getComparedProducts = () => items.filter((p) => compareProducts.includes(p.id))
 
   return (
     <div className="min-h-screen bg-background">
-      <VisitorHeader />
+      {user ? (user.role === "admin" ? <Navigation centered /> : <Navigation />) : <VisitorHeader />}
 
       <main className="container mx-auto py-8 px-4">
         {/* Header */}
@@ -146,7 +159,7 @@ export default function CatalogPage() {
         {/* Results */}
         <div className="mb-4">
           <p className="text-muted-foreground">
-            Showing {filteredProducts.length} products
+            {loading ? "Loading products…" : `Showing ${items.length} products`}
             {selectedCategory && (
               <Badge variant="secondary" className="ml-2">
                 {categories.find((c) => c.id === selectedCategory)?.name}
@@ -161,15 +174,15 @@ export default function CatalogPage() {
         </div>
 
         {/* Products Grid */}
-        {filteredProducts.length > 0 ? (
+        {items.length > 0 ? (
           <div
             className={`grid gap-6 ${
               viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"
             }`}
           >
-            {filteredProducts.map((product) => (
+            {items.map((product) => (
               <div key={product.id} className="relative">
-                <div className="absolute top-2 right-2 z-10">
+                <div className="absolute top-2 left-2 z-10">
                   <div className="flex items-center space-x-2 bg-white/90 backdrop-blur-sm rounded-md p-2 shadow-sm">
                     <Checkbox
                       id={`compare-${product.id}`}

@@ -1,27 +1,40 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Navigation } from "@/components/navigation"
 import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, TrendingUp, Star, Clock } from "lucide-react"
-import { products, categories } from "@/lib/products"
+import { fetchProducts, categories, type Product } from "@/lib/products"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth"
 
 export default function CustomerHomePage() {
   const [searchQuery, setSearchQuery] = useState("")
   const { logout } = useAuth()
+  const [items, setItems] = useState<Product[]>([])
 
   const handleLogout = () => {
     logout()
     window.location.href = "/"
   }
 
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const list = await fetchProducts()
+        setItems(list)
+      } catch (e) {
+        // ignore for now
+      }
+    }
+    void load()
+  }, [])
+
   // Get featured products (first 6)
-  const featuredProducts = products.slice(0, 6)
+  const featuredProducts = items.slice(0, 6)
 
   // Get trending categories
   const trendingCategories = categories.slice(0, 4)

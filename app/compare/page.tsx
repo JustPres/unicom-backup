@@ -1,20 +1,43 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, X } from "lucide-react"
-import { products } from "@/lib/products"
+import { fetchProductsByIds, type Product } from "@/lib/products"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 
 function CompareContent() {
   const searchParams = useSearchParams()
   const productIds = searchParams.get("products")?.split(",") || []
+  const [items, setItems] = useState<Product[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const compareProducts = products.filter((p) => productIds.includes(p.id))
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      setLoading(true)
+      try {
+        const list = await fetchProductsByIds(productIds)
+        if (!cancelled) setItems(list)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [productIds.join(",")])
+
+  if (loading) {
+    return <div className="text-center py-12">Loading comparison…</div>
+  }
+
+  const compareProducts = items
 
   if (compareProducts.length < 2) {
     return (

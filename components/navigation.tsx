@@ -76,7 +76,7 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className={`container flex h-16 items-center ${centered ? "justify-center" : "justify-between"}`}>
+      <div className={`container relative flex h-16 items-center ${centered ? "justify-center" : "justify-between"}`}>
         {/* Logo */}
         {!centered && (
           <Link
@@ -187,6 +187,15 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
                 </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Logout when centered (e.g., admin centered navbar) */}
+        {centered && user && (
+          <div className="absolute right-4">
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
+              <LogOut className="h-4 w-4 mr-2" /> Log out
+            </Button>
           </div>
         )}
 

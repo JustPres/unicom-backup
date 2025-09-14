@@ -13,6 +13,20 @@ export async function POST(request: Request) {
         const body = await request.json()
         const { email, password } = LoginSchema.parse(body)
 
+        // Temporary dummy admin fallback (for development/demo)
+        const DEMO_ADMIN_EMAIL = process.env.DEMO_ADMIN_EMAIL || "admin@demo.local"
+        const DEMO_ADMIN_PASSWORD = process.env.DEMO_ADMIN_PASSWORD || "admin123"
+        if (email === DEMO_ADMIN_EMAIL && password === DEMO_ADMIN_PASSWORD) {
+            return NextResponse.json({
+                user: {
+                    id: "demo-admin",
+                    email: DEMO_ADMIN_EMAIL,
+                    name: "Demo Admin",
+                    role: "admin" as const,
+                },
+            })
+        }
+
         const client = await clientPromise!
         const db = client.db(process.env.MONGODB_DB || "unicom")
         const users = db.collection("users")
