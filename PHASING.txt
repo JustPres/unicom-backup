@@ -73,11 +73,29 @@ Phase 5 — Visitor Navbar Standardization and UX Polishing
   - Deploy and verify production.
 
 
-Notes & Next Candidates (Post-Phase 5)
+Phase 6 — Backend API Implementation and Database Integration
+- Requirements:
+  - Full MongoDB integration with connection pooling (`lib/db.ts`).
+  - Authentication API routes (`/api/auth/login`, `/api/auth/register`) with bcrypt hashing and Zod validation.
+  - Products API with full CRUD operations (`/api/products`, `/api/products/[id]`):
+    - GET with search, category filtering, and bulk ID fetching.
+    - POST for creating products with validation.
+    - PUT/DELETE for admin product management.
+  - Quotes API (`/api/quotes`, `/api/quotes/[id]`) with:
+    - POST for quote creation with item calculation.
+    - GET with customer email and status filtering.
+    - PATCH for admin quote status updates.
+    - DELETE for quote management.
+  - Admin login page (`/admin/login`) with dedicated styling and AdminLoginForm component.
+  - Product comparison system (`/compare`) with URL-based product selection and side-by-side comparison.
+  - Individual product detail pages (`/catalog/[id]`) with specifications, ratings, and quote integration.
+  - Deploy and verify all API endpoints are functional.
+
+
+Notes & Next Candidates (Post-Phase 6)
 - Optional:
   - Add hamburger mobile menu to `VisitorHeader` (Sheet) mirroring authenticated nav.
-  - Seed sample products in `lib/products.ts` to showcase catalog/search/compare flows.
-  - Add “Clear chat” button to chatbot to reset localStorage.
-  - Connect real database (MongoDB/Vercel KV/Postgres) and wire quotes/products APIs.
+  - Seed sample products in database to showcase catalog/search/compare flows.
+  - Add "Clear chat" button to chatbot to reset localStorage.
   - Enable Vercel Analytics and basic uptime monitoring.
  
