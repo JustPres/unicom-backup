@@ -131,23 +131,6 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* CTA */}
-      <Card className="text-center">
-        <CardHeader>
-          <CardTitle>Ready to Experience the Unicom Difference?</CardTitle>
-          <CardDescription>
-            Join thousands of satisfied customers who trust us with their technology needs
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">Browse Our Catalog</Button>
-            <Button variant="outline" size="lg">
-              Contact Us Today
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
       </main>
     </div>
   )
