@@ -6,10 +6,15 @@ A modern e-commerce platform for electronics and IT solutions built with Next.js
 
 - **Multi-role Authentication**: Customer and Admin dashboards with secure login
 - **Product Management**: Full CRUD operations with search, filtering, and comparison
-- **Quote System**: Request and manage custom quotes with real-time status tracking
+- **Advanced Quote System**: 
+  - User-specific quote requests with auto-populated email
+  - Professional quotation dialog with PDF export
+  - Real-time status tracking (pending, approved, rejected, expired)
+  - Admin quote management with bulk operations
 - **AI Assistant**: Local intent-based chatbot for navigation and product search
 - **Responsive Design**: Mobile-first approach with Tailwind CSS and shadcn/ui
 - **Real-time Data**: MongoDB integration with connection pooling
+- **User Experience**: Consistent navigation, form validation, and error handling
 
 ## 🛠️ Tech Stack
 
@@ -102,19 +107,19 @@ unicom-catalog/
 - **Register** (`/register`) - New customer registration
 
 ### For Customers (Authenticated)
-- **Dashboard** (`/dashboard`) - Personal dashboard with recent quotes
+- **Dashboard** (`/dashboard`) - Personal dashboard with recent quotes and statistics
 - **Catalog** (`/catalog`) - Product browsing with comparison tools
-- **Get Quote** (`/quote`) - Request custom quotes
-- **My Quotes** (`/quotes`) - View and track quote requests
-- **Support** (`/support`) - Customer support
+- **Get Quote** (`/quote`) - Request custom quotes with professional quotation dialog
+- **My Quotes** (`/customer/quotes`) - View and track quote requests with search/filter
+- **Support** (`/customer/support`) - Customer support
 - **Profile** (`/profile`) - Account management
 
 ### For Admins (Authenticated)
-- **Dashboard** (`/dashboard`) - Admin overview and management
+- **Dashboard** (`/dashboard`) - Admin overview with quote statistics and management
 - **Catalog** (`/catalog`) - Product catalog management
-- **Quotes** (`/quotes`) - Quote approval and management
-- **Analytics** (`/analytics`) - Business analytics
-- **Inventory** (`/inventory`) - Stock management
+- **Quotes** (`/quotes`) - Complete quote management with status updates and filtering
+- **Analytics** (`/analytics`) - Business analytics and reporting
+- **Inventory** (`/inventory`) - Stock management with product CRUD operations
 
 ## 🤖 AI Assistant Features
 
@@ -127,21 +132,21 @@ The integrated chatbot supports:
 ## 📊 API Endpoints
 
 ### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login with bcrypt validation
+- `POST /api/auth/register` - User registration with role assignment
 
 ### Products
 - `GET /api/products` - List products (with search/filter)
-- `POST /api/products` - Create product (admin)
+- `POST /api/products` - Create product (admin only)
 - `GET /api/products/[id]` - Get product details
-- `PUT /api/products/[id]` - Update product (admin)
-- `DELETE /api/products/[id]` - Delete product (admin)
+- `PUT /api/products/[id]` - Update product (admin only)
+- `DELETE /api/products/[id]` - Delete product (admin only)
 
 ### Quotes
-- `GET /api/quotes` - List quotes (filtered by user)
-- `POST /api/quotes` - Create quote request
+- `GET /api/quotes` - List quotes (filtered by customer email or all for admin)
+- `POST /api/quotes` - Create quote request with automatic user association
 - `GET /api/quotes/[id]` - Get quote details
-- `PATCH /api/quotes/[id]` - Update quote status (admin)
+- `PATCH /api/quotes/[id]` - Update quote status and admin notes
 - `DELETE /api/quotes/[id]` - Delete quote
 
 ## 🎨 Data Models
@@ -189,6 +194,16 @@ The integrated chatbot supports:
   expiresAt: Date
   adminNotes?: string
 }
+
+### QuoteItem
+```typescript
+{
+  productId: string
+  productName: string
+  quantity: number
+  unitPrice: number
+  customSpecs?: string
+}
 ```
 
 ## 🚀 Deployment
@@ -220,6 +235,8 @@ pnpm start
 
 The project follows a structured development approach documented in `PHASING.txt`:
 - Phase 0-6: Core functionality (Complete)
+- Phase 7: Advanced Quote System (Complete)
+- Phase 8: UI/UX Improvements and Data Integrity (Complete)
 - Future phases: Enhanced features and optimizations
 
 ## 🤝 Contributing
