@@ -76,22 +76,6 @@ export default function ServicesPage() {
         ))}
       </div>
 
-      <div className="text-center">
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Need a Custom Solution?</CardTitle>
-            <CardDescription>Contact us for personalized IT consulting and custom service packages</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button size="lg" className="mr-4">
-              Request Quote
-            </Button>
-            <Button variant="outline" size="lg">
-              Contact Support
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
       </main>
     </div>
   )

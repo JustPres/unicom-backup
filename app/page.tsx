@@ -65,12 +65,16 @@ export default function HomePage() {
             products, personalized service, cost-efficient solutions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8">
-              Browse Catalog
-              <ArrowRight className="w-5 h-5 ml-2" />
+            <Button size="lg" className="text-lg px-8" asChild>
+              <Link href="/catalog">
+                Browse Catalog
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 bg-transparent">
-              Get Quote
+            <Button variant="outline" size="lg" className="text-lg px-8 bg-transparent" asChild>
+              <Link href="/login">
+                Get Quote
+              </Link>
             </Button>
           </div>
         </div>
@@ -181,16 +185,16 @@ export default function HomePage() {
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
             Browse our catalog or contact us for personalized recommendations and quotes
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8">
-              View Catalog
-            </Button>
+          <div className="flex justify-center">
             <Button
               size="lg"
               variant="outline"
               className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary bg-transparent"
+              asChild
             >
-              Contact Us
+              <Link href="/support">
+                Contact Us
+              </Link>
             </Button>
           </div>
         </div>
