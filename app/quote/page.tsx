@@ -29,15 +29,39 @@ export default function QuotePage() {
     setShowQuotationDialog(true)
   }
 
-  const handleConfirmQuote = () => {
-    setShowQuotationDialog(false)
-    setQuoteSubmitted(true)
-    setPendingQuote(null)
+  const handleConfirmQuote = async () => {
+    if (!pendingQuote) return
 
-    // Reset after 5 seconds
-    setTimeout(() => {
-      setQuoteSubmitted(false)
-    }, 5000)
+    try {
+      const response = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: pendingQuote.customerName,
+          customerEmail: pendingQuote.customerEmail,
+          company: pendingQuote.company,
+          phone: pendingQuote.phone,
+          items: pendingQuote.items,
+          notes: pendingQuote.notes,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to submit quote")
+      }
+
+      setShowQuotationDialog(false)
+      setQuoteSubmitted(true)
+      setPendingQuote(null)
+
+      // Reset after 5 seconds
+      setTimeout(() => {
+        setQuoteSubmitted(false)
+      }, 5000)
+    } catch (error) {
+      console.error("Error submitting quote:", error)
+      // You might want to show an error message to the user
+    }
   }
 
   const handleCancelQuote = () => {

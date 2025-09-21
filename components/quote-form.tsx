@@ -12,22 +12,23 @@ import { Separator } from "@/components/ui/separator"
 import { Plus, Minus, Send, Calculator } from "lucide-react"
 import { fetchProducts, type Product } from "@/lib/products"
 import type { QuoteItem } from "@/lib/quotes"
+import { useAuth } from "@/lib/auth"
 
 interface QuoteFormProps {
   onSubmit?: (quoteData: any) => void
 }
 
 export function QuoteForm({ onSubmit }: QuoteFormProps) {
+  const { user } = useAuth()
   const [customerInfo, setCustomerInfo] = useState({
-    name: "",
-    email: "",
+    name: user?.name || "",
+    email: user?.email || "",
     company: "",
     phone: "",
   })
 
   const [items, setItems] = useState<QuoteItem[]>([])
   const [notes, setNotes] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
@@ -41,6 +42,17 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
     }
     void load()
   }, [])
+
+  // Update customer info when user changes
+  useEffect(() => {
+    if (user) {
+      setCustomerInfo(prev => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+      }))
+    }
+  }, [user])
 
   const addItem = () => {
     const newItem: QuoteItem = {
@@ -79,39 +91,30 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
 
-    try {
-      const response = await fetch("/api/quotes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerName: customerInfo.name,
-          customerEmail: customerInfo.email,
-          company: customerInfo.company,
-          phone: customerInfo.phone,
-          items,
-          notes,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to submit quote")
-      }
-
-      const data = await response.json()
-      onSubmit?.(data.quote)
-    } catch (error) {
-      console.error("Error submitting quote:", error)
-      // You might want to show an error message to the user
-    } finally {
-      setIsSubmitting(false)
-
-      // Reset form
-      setCustomerInfo({ name: "", email: "", company: "", phone: "" })
-      setItems([])
-      setNotes("")
+    // Validate form
+    if (items.length === 0 || !customerInfo.name || !customerInfo.email) {
+      return
     }
+
+    // Create quote data for preview
+    const quoteData = {
+      id: crypto.randomUUID(),
+      customerName: customerInfo.name,
+      customerEmail: customerInfo.email,
+      company: customerInfo.company,
+      phone: customerInfo.phone,
+      items,
+      notes,
+      totalAmount: calculateTotal(),
+      status: "pending" as const,
+      createdAt: new Date(),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+    }
+
+    console.log("Quote data created:", quoteData)
+    // Show dialog instead of submitting directly
+    onSubmit?.(quoteData)
   }
 
   return (
@@ -131,6 +134,7 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
                 value={customerInfo.name}
                 onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
                 required
+                placeholder="Enter your full name for this quote"
               />
             </div>
             <div className="space-y-2">
@@ -139,9 +143,13 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
                 id="email"
                 type="email"
                 value={customerInfo.email}
-                onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                required
+                disabled
+                className="bg-muted text-muted-foreground cursor-not-allowed"
+                title="Email is automatically set from your account"
               />
+              <p className="text-xs text-muted-foreground">
+                Email is automatically set from your logged-in account
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
@@ -288,19 +296,10 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
         <Button
           type="submit"
           size="lg"
-          disabled={isSubmitting || items.length === 0 || !customerInfo.name || !customerInfo.email}
+          disabled={items.length === 0 || !customerInfo.name || !customerInfo.email}
         >
-          {isSubmitting ? (
-            <>
-              <Calculator className="mr-2 h-4 w-4 animate-spin" />
-              Processing Quote...
-            </>
-          ) : (
-            <>
-              <Send className="mr-2 h-4 w-4" />
-              Request Quote
-            </>
-          )}
+          <Send className="mr-2 h-4 w-4" />
+          Request Quote
         </Button>
       </div>
     </form>

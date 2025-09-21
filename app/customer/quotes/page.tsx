@@ -34,10 +34,14 @@ export default function CustomerQuotesPage() {
 
   const fetchQuotes = async () => {
     try {
+      console.log("Fetching quotes for customer:", user?.email)
       const response = await fetch(`/api/quotes?customerEmail=${encodeURIComponent(user?.email || "")}`)
       if (response.ok) {
         const data = await response.json()
+        console.log("Customer quotes response:", data.quotes)
         setQuotes(data.quotes)
+      } else {
+        console.error("Failed to fetch customer quotes:", response.status)
       }
     } catch (error) {
       console.error("Error fetching quotes:", error)
@@ -96,20 +100,25 @@ export default function CustomerQuotesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
 
       <main className="container mx-auto py-8 px-4">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-balance">My Quotes</h1>
-            <p className="text-muted-foreground mt-2">View and track your quote requests</p>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-balance">My Quotes</h1>
+              <p className="text-muted-foreground mt-2">View and track your quote requests</p>
+            </div>
+            <Button asChild>
+              <Link href="/quote">
+                <Plus className="h-4 w-4 mr-2" />
+                Request New Quote
+              </Link>
+            </Button>
           </div>
-          <Button asChild>
-            <Link href="/quote">
-              <Plus className="h-4 w-4 mr-2" />
-              Request New Quote
-            </Link>
-          </Button>
+          <Badge variant="secondary">
+            Customer
+          </Badge>
         </div>
 
         {/* Stats */}
@@ -222,7 +231,7 @@ export default function CustomerQuotesPage() {
                           <span className="ml-1">{quote.status}</span>
                         </Badge>
                       </TableCell>
-                      <TableCell>{quote.createdAt.toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Button size="sm" variant="outline">
                           <Eye className="h-4 w-4 mr-1" />

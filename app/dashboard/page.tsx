@@ -83,10 +83,14 @@ function CustomerDashboard() {
 
   const fetchRecentQuotes = async () => {
     try {
+      console.log("Fetching quotes for user:", user?.email)
       const response = await fetch(`/api/quotes?customerEmail=${encodeURIComponent(user?.email || "")}`)
       if (response.ok) {
         const data = await response.json()
+        console.log("Quotes response:", data.quotes)
         setQuotes(data.quotes.slice(0, 3)) // Get only recent 3
+      } else {
+        console.error("Failed to fetch quotes:", response.status)
       }
     } catch (error) {
       console.error("Error fetching quotes:", error)

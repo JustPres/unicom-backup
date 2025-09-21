@@ -89,7 +89,7 @@ export default function AdminQuotesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       })
-      
+
       if (response.ok) {
         await fetchQuotes() // Refresh the list
       }
@@ -112,14 +112,15 @@ export default function AdminQuotesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
 
       <main className="container mx-auto py-8 px-4">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-balance">Quote Management</h1>
-            <p className="text-muted-foreground mt-2">Manage customer quote requests</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-balance">Quote Management</h1>
+          <p className="text-muted-foreground mt-2">Manage customer quote requests</p>
+          <Badge variant="default" className="mt-2">
+            Administrator
+          </Badge>
         </div>
 
         {/* Stats */}
@@ -242,8 +243,8 @@ export default function AdminQuotesPage() {
                           </Button>
                           {quote.status === "pending" && (
                             <>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="outline"
                                 onClick={() => updateQuoteStatus(quote.id, "approved")}
                                 className="text-emerald-600 hover:text-emerald-700"
@@ -251,8 +252,8 @@ export default function AdminQuotesPage() {
                                 <CheckCircle className="h-4 w-4 mr-1" />
                                 Approve
                               </Button>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="outline"
                                 onClick={() => updateQuoteStatus(quote.id, "rejected")}
                                 className="text-red-600 hover:text-red-700"

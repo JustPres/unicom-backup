@@ -47,7 +47,7 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
         { href: "/customer/home", label: "Home" },
         { href: "/catalog", label: "Catalog" },
         { href: "/quote", label: "Get Quote" },
-        { href: "/quotes", label: "My Quotes" },
+        { href: "/customer/quotes", label: "My Quotes" },
         { href: "/customer/support", label: "Support" },
         { href: "/dashboard", label: "Dashboard" },
       ]
