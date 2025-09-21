@@ -54,7 +54,7 @@ export default function CatalogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {user ? (user.role === "admin" ? <Navigation centered /> : <Navigation />) : <VisitorHeader />}
+      {user ? <Navigation centered /> : <VisitorHeader />}
 
       <main className="container mx-auto py-8 px-4">
         {/* Header */}

@@ -133,22 +133,6 @@ function CustomerDashboard() {
         </CardContent>
       </Card>
 
-      
-
-      {/* Account actions */}
-      <div className="pt-8 text-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground"
-          onClick={() => {
-            logout()
-            window.location.href = "/"
-          }}
-        >
-          Log out
-        </Button>
-      </div>
     </div>
   )
 }

@@ -17,7 +17,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation centered />
         <div className="min-h-screen flex items-center justify-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>
         </div>
@@ -28,7 +28,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation centered />
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto text-center">
             <CardHeader>
@@ -48,7 +48,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-8">

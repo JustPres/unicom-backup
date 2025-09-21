@@ -41,7 +41,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {user ? (user.role === "admin" ? <Navigation centered /> : <Navigation />) : <Navigation />}
+      {user ? <Navigation centered /> : <Navigation />}
 
       <main className="container mx-auto py-8 px-4">
         {/* Breadcrumb */}

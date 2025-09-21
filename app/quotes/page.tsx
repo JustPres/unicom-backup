@@ -21,12 +21,17 @@ export default function QuotesPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all")
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) {
+    if (!loading && !user) {
       router.push("/login")
     }
   }, [user, loading, router])
 
   const filteredQuotes = quotes.filter((quote) => {
+    // For customers, only show their own quotes
+    if (user?.role === "customer" && quote.customerEmail !== user.email) {
+      return false
+    }
+
     const matchesSearch =
       quote.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       quote.customerEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,7 +78,7 @@ export default function QuotesPage() {
     )
   }
 
-  if (!user || user.role !== "admin") {
+  if (!user) {
     return null
   }
 
@@ -83,8 +88,15 @@ export default function QuotesPage() {
 
       <main className="container mx-auto py-8 px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-balance">Quote Management</h1>
-          <p className="text-muted-foreground mt-2">Manage customer quote requests and proposals</p>
+          <h1 className="text-3xl font-bold text-balance">
+            {user.role === "admin" ? "Quote Management" : "My Quotes"}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            {user.role === "admin" 
+              ? "Manage customer quote requests and proposals" 
+              : "View and track your quote requests"
+            }
+          </p>
         </div>
 
         {/* Removed demo stats cards */}

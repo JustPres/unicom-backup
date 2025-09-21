@@ -1,13 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { QuoteForm } from "@/components/quote-form"
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle, Clock, Calculator, Users } from "lucide-react"
+import { useAuth } from "@/lib/auth"
 
 export default function QuotePage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
   const [quoteSubmitted, setQuoteSubmitted] = useState(false)
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login")
+    }
+  }, [user, loading, router])
 
   const handleQuoteSubmit = (quoteData: any) => {
     console.log("Quote submitted:", quoteData)
@@ -19,10 +29,22 @@ export default function QuotePage() {
     }, 5000)
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600"></div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
   if (quoteSubmitted) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation centered />
 
         <main className="container mx-auto py-16 px-4">
           <div className="max-w-2xl mx-auto text-center space-y-6">
@@ -54,7 +76,7 @@ export default function QuotePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
 
       <main className="container mx-auto py-8 px-4">
         {/* Header */}
@@ -66,41 +88,34 @@ export default function QuotePage() {
           </p>
         </div>
 
-        {/* Benefits */}
-        <div className="grid gap-6 md:grid-cols-3 mb-12">
-          <Card className="text-center">
+        {/* Services Offered */}
+        <div className="mb-12">
+          <Card>
             <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calculator className="w-6 h-6 text-emerald-600" />
+              <h3 className="text-xl font-semibold mb-6 text-center">Services Offered</h3>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Calculator className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h4 className="font-medium mb-2">Custom Solutions</h4>
+                  <p className="text-sm text-muted-foreground">Tailored technology solutions for your business needs</p>
+                </div>
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Clock className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h4 className="font-medium mb-2">Installation Services</h4>
+                  <p className="text-sm text-muted-foreground">Professional setup and configuration of your equipment</p>
+                </div>
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Users className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h4 className="font-medium mb-2">Technical Support</h4>
+                  <p className="text-sm text-muted-foreground">Ongoing maintenance and troubleshooting assistance</p>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Custom Pricing</h3>
-              <p className="text-sm text-muted-foreground">
-                Get competitive pricing tailored to your specific requirements and volume needs.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold mb-2">Fast Response</h3>
-              <p className="text-sm text-muted-foreground">
-                Receive your detailed quote within 24 hours of submission.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="font-semibold mb-2">Expert Support</h3>
-              <p className="text-sm text-muted-foreground">
-                Our technical experts will help you choose the right solutions.
-              </p>
             </CardContent>
           </Card>
         </div>

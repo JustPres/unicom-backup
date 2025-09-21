@@ -41,7 +41,7 @@ export default function CustomerHomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
 
       <main className="container mx-auto py-8 px-4">
         {/* Welcome Section */}
@@ -140,12 +140,6 @@ export default function CustomerHomePage() {
           </div>
         </div>
 
-        {/* Account actions (subtle) */}
-        <div className="mt-12 text-center">
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleLogout}>
-            Log out
-          </Button>
-        </div>
       </main>
     </div>
   )

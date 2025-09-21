@@ -23,11 +23,11 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
 
   const isActive = (href: string) => {
     if (!href) return false
-    // Special case: for customers, highlight Dashboard when on customer home
-    if (user?.role === "customer" && href === "/dashboard") {
-      if (pathname === "/customer/home") return true
+    // Exact match for most routes
+    if (href === "/dashboard") {
+      return pathname === href
     }
-    // Treat exact match or path starting with href as active for nested routes
+    // For other routes, use exact match or path starting with href
     return pathname === href || pathname.startsWith(href + "/")
   }
 
@@ -42,13 +42,13 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
         { href: "/about", label: "About" },
       ]
     } else if (user.role === "customer") {
-      // Customer navigation
+      // Customer navigation - ensure all routes stay in customer context
       return [
         { href: "/customer/home", label: "Home" },
         { href: "/catalog", label: "Catalog" },
         { href: "/quote", label: "Get Quote" },
-        { href: "/customer/quotes", label: "My Quotes" },
-        { href: "/support", label: "Support" },
+        { href: "/quotes", label: "My Quotes" },
+        { href: "/customer/support", label: "Support" },
         { href: "/dashboard", label: "Dashboard" },
       ]
     } else {
@@ -98,7 +98,7 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
         )}
 
         {/* Desktop Navigation */}
-        <nav className={`hidden md:flex items-center space-x-6 ${centered ? "mx-auto" : ""}`}>
+        <nav className={`hidden md:flex items-center space-x-6 ${centered ? "justify-center flex-1" : ""}`}>
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -190,7 +190,7 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
           </div>
         )}
 
-        {/* Logout when centered (e.g., admin centered navbar) */}
+        {/* Logout when centered (for both admin and customer) */}
         {centered && user && (
           <div className="absolute right-4">
             <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-foreground">

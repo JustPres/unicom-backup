@@ -1,18 +1,23 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Phone, Mail, MapPin, Clock, MessageCircle, FileText } from "lucide-react"
-import { VisitorHeader } from "@/components/visitor-header"
+import { Navigation } from "@/components/navigation"
+import { useAuth } from "@/lib/auth"
 
-export default function SupportPage() {
+export default function CustomerSupportPage() {
+  const { user } = useAuth()
+  
   return (
     <div className="min-h-screen bg-background">
-      <VisitorHeader />
+      <Navigation centered />
       <main className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4 text-balance">Technical Support</h1>
+        <h1 className="text-4xl font-bold mb-4 text-balance">Customer Support</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
           Get help when you need it. Our expert support team is here to assist you with all your technical needs.
         </p>
@@ -59,7 +64,6 @@ export default function SupportPage() {
               </div>
             </CardContent>
           </Card>
-
         </div>
 
         {/* Support Form */}
@@ -72,16 +76,16 @@ export default function SupportPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" placeholder="John" />
+                <Input id="firstName" placeholder={user?.name?.split(' ')[0] || "John"} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" placeholder="Doe" />
+                <Input id="lastName" placeholder={user?.name?.split(' ')[1] || "Doe"} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="john@example.com" />
+              <Input id="email" type="email" placeholder={user?.email || "john@example.com"} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone (Optional)</Label>

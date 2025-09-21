@@ -130,7 +130,7 @@ function CompareContent() {
 export default function ComparePage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation centered />
       <main className="container mx-auto py-8 px-4">
         <Suspense fallback={<div>Loading comparison...</div>}>
           <CompareContent />
