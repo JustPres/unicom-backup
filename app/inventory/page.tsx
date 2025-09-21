@@ -103,35 +103,73 @@ export default function InventoryPage() {
               Add Product
             </Button>
             <Dialog open={open} onOpenChange={setOpen}>
-              <DialogContent className="sm:max-w-lg">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Add New Product</DialogTitle>
+                  <DialogTitle>{editingId ? "Edit Product" : "Add New Product"}</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-2">
-                  <div className="grid grid-cols-4 items-center gap-2">
-                    <Label htmlFor="name" className="col-span-4 sm:col-span-1">Name</Label>
-                    <Input id="name" className="col-span-4 sm:col-span-3" value={name} onChange={(e) => setName(e.target.value)} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-4">
+                  {/* Left Column - Basic Info */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Product Name *</Label>
+                      <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter product name" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="brand">Brand *</Label>
+                        <Input id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Brand name" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="price">Price *</Label>
+                        <Input
+                          id="price"
+                          type="number"
+                          step="0.01"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category *</Label>
+                      <select
+                        id="category"
+                        className="w-full border rounded-md h-9 px-3 bg-background"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                      >
+                        <option value="">Select category</option>
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <textarea
+                        id="description"
+                        className="w-full border rounded-md bg-background p-3 text-sm resize-none"
+                        rows={4}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Product description..."
+                      />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="inStock" checked={inStock} onCheckedChange={(v) => setInStock(Boolean(v))} />
+                      <Label htmlFor="inStock">In stock</Label>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-2">
-                    <Label htmlFor="brand" className="col-span-4 sm:col-span-1">Brand</Label>
-                    <Input id="brand" className="col-span-4 sm:col-span-3" value={brand} onChange={(e) => setBrand(e.target.value)} />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-2">
-                    <Label htmlFor="price" className="col-span-4 sm:col-span-1">Price</Label>
-                    <Input id="price" type="number" step="0.01" className="col-span-4 sm:col-span-3" value={price} onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))} />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-2">
-                    <Label htmlFor="category" className="col-span-4 sm:col-span-1">Category</Label>
-                    <select id="category" className="col-span-4 sm:col-span-3 border rounded-md h-9 px-2 bg-background" value={category} onChange={(e) => setCategory(e.target.value)}>
-                      <option value="">Select category</option>
-                      {categories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-4 items-start gap-2">
-                    <Label htmlFor="image" className="col-span-4 sm:col-span-1">Image</Label>
-                    <div className="col-span-4 sm:col-span-3 space-y-2">
+
+                  {/* Right Column - Image & Specs */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="image">Product Image</Label>
                       <Input
                         id="image"
                         type="file"
@@ -147,64 +185,68 @@ export default function InventoryPage() {
                         }}
                       />
                       {image && (
-                        <div className="border rounded-md p-2 bg-muted/30">
-                          <p className="text-xs text-muted-foreground mb-1">Preview</p>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={image} alt="Preview" className="h-24 w-24 object-cover rounded" />
+                        <div className="border rounded-md p-3 bg-muted/30">
+                          <p className="text-sm text-muted-foreground mb-2">Preview</p>
+                          <div className="flex justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={image}
+                              alt="Preview"
+                              className="max-h-32 max-w-32 object-cover rounded border"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
-                  </div>
-                  <div className="grid grid-cols-4 items-start gap-2">
-                    <Label htmlFor="description" className="col-span-4 sm:col-span-1">Description</Label>
-                    <textarea id="description" className="col-span-4 sm:col-span-3 border rounded-md bg-background p-2 text-sm" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
-                  </div>
-                  <div className="grid grid-cols-4 items-start gap-2">
-                    <Label className="col-span-4 sm:col-span-1">Specifications</Label>
-                    <div className="col-span-4 sm:col-span-3 space-y-2">
+
+                    <div className="space-y-2">
+                      <Label>Specifications (Optional)</Label>
                       {specRows.length === 0 && (
-                        <p className="text-xs text-muted-foreground">Optional. Add key/value technical specs.</p>
+                        <p className="text-xs text-muted-foreground">Add technical specifications as key-value pairs</p>
                       )}
-                      {specRows.map((row, idx) => (
-                        <div key={idx} className="grid grid-cols-5 gap-2">
-                          <Input
-                            placeholder="Key (e.g., CPU)"
-                            value={row.key}
-                            onChange={(e) => {
-                              const copy = [...specRows]
-                              copy[idx].key = e.target.value
-                              setSpecRows(copy)
-                            }}
-                            className="col-span-2"
-                          />
-                          <Input
-                            placeholder="Value (e.g., Ryzen 7)"
-                            value={row.value}
-                            onChange={(e) => {
-                              const copy = [...specRows]
-                              copy[idx].value = e.target.value
-                              setSpecRows(copy)
-                            }}
-                            className="col-span-2"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="bg-transparent"
-                            onClick={() => setSpecRows(specRows.filter((_, i) => i !== idx))}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                      <Button type="button" variant="secondary" onClick={() => setSpecRows([...specRows, { key: "", value: "" }])}>
-                        Add Specification
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {specRows.map((row, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <Input
+                              placeholder="Key (e.g., CPU)"
+                              value={row.key}
+                              onChange={(e) => {
+                                const copy = [...specRows]
+                                copy[idx].key = e.target.value
+                                setSpecRows(copy)
+                              }}
+                              className="flex-1"
+                            />
+                            <Input
+                              placeholder="Value (e.g., Ryzen 7)"
+                              value={row.value}
+                              onChange={(e) => {
+                                const copy = [...specRows]
+                                copy[idx].value = e.target.value
+                                setSpecRows(copy)
+                              }}
+                              className="flex-1"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSpecRows(specRows.filter((_, i) => i !== idx))}
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setSpecRows([...specRows, { key: "", value: "" }])}
+                      >
+                        + Add Specification
                       </Button>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="inStock" checked={inStock} onCheckedChange={(v) => setInStock(Boolean(v))} />
-                    <Label htmlFor="inStock">In stock</Label>
                   </div>
                 </div>
                 <DialogFooter>

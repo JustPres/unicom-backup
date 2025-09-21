@@ -29,6 +29,11 @@ export async function POST(request: Request) {
         const db = client.db(process.env.MONGODB_DB || "unicom")
         const quotes = db.collection("quotes")
 
+        // Ensure quotes collection exists and create indexes
+        await quotes.createIndex({ customerEmail: 1 })
+        await quotes.createIndex({ status: 1 })
+        await quotes.createIndex({ createdAt: -1 })
+
         const totalAmount = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
         const id = crypto.randomUUID()
         const now = new Date()

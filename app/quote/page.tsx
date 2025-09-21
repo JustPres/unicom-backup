@@ -4,14 +4,18 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { QuoteForm } from "@/components/quote-form"
+import { QuotationDialog } from "@/components/quotation-dialog"
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle, Clock, Calculator, Users } from "lucide-react"
 import { useAuth } from "@/lib/auth"
+import type { Quote } from "@/lib/quotes"
 
 export default function QuotePage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [quoteSubmitted, setQuoteSubmitted] = useState(false)
+  const [showQuotationDialog, setShowQuotationDialog] = useState(false)
+  const [pendingQuote, setPendingQuote] = useState<Quote | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -19,14 +23,26 @@ export default function QuotePage() {
     }
   }, [user, loading, router])
 
-  const handleQuoteSubmit = (quoteData: any) => {
+  const handleQuoteSubmit = (quoteData: Quote) => {
     console.log("Quote submitted:", quoteData)
+    setPendingQuote(quoteData)
+    setShowQuotationDialog(true)
+  }
+
+  const handleConfirmQuote = () => {
+    setShowQuotationDialog(false)
     setQuoteSubmitted(true)
+    setPendingQuote(null)
 
     // Reset after 5 seconds
     setTimeout(() => {
       setQuoteSubmitted(false)
     }, 5000)
+  }
+
+  const handleCancelQuote = () => {
+    setShowQuotationDialog(false)
+    setPendingQuote(null)
   }
 
   if (loading) {
@@ -124,6 +140,15 @@ export default function QuotePage() {
         <div className="max-w-4xl mx-auto">
           <QuoteForm onSubmit={handleQuoteSubmit} />
         </div>
+
+        {/* Quotation Dialog */}
+        <QuotationDialog
+          open={showQuotationDialog}
+          onOpenChange={setShowQuotationDialog}
+          quote={pendingQuote}
+          onConfirm={handleConfirmQuote}
+          onCancel={handleCancelQuote}
+        />
       </main>
     </div>
   )
