@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   description:
     "Your trusted local provider for computer parts, accessories, and technical support services. Quality products and personalized service for consumers and businesses.",
   generator: "v0.app",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/><circle cx='12' cy='7' r='1.5'/><circle cx='12' cy='12' r='1.5'/><circle cx='12' cy='17' r='1.5'/></svg>",
+  },
 }
 
 export default function RootLayout({
