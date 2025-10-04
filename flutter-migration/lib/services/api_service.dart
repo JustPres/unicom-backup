@@ -6,7 +6,7 @@ import '../models/quote.dart';
 
 class ApiService {
   // Replace with your actual Vercel deployment URL
-  static const String baseUrl = 'https://unicom-catalog-7ekonxxuy-justpres-projects.vercel.app/api';
+  static const String baseUrl = 'https://unicom-catalog-7ekonxxuy-justpres-projects.vercel.app';
   
   static const Map<String, String> _headers = {
     'Content-Type': 'application/json',
