@@ -1,15 +1,22 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Phone, Mail, MapPin, Clock, MessageCircle, FileText } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, MessageCircle, FileText, Ticket } from "lucide-react"
 import { VisitorHeader } from "@/components/visitor-header"
+import { Navigation } from "@/components/navigation"
+import { useAuth } from "@/lib/auth"
+import Link from "next/link"
 
 export default function SupportPage() {
+  const { user } = useAuth()
+
   return (
     <div className="min-h-screen bg-background">
-      <VisitorHeader />
+      {user ? <Navigation centered /> : <VisitorHeader />}
       <main className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 text-balance">Technical Support</h1>
@@ -60,42 +67,96 @@ export default function SupportPage() {
             </CardContent>
           </Card>
 
+          {/* Support Ticket Section for Logged-in Users */}
+          {user && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ticket className="h-5 w-5 text-emerald-600" />
+                  Support Tickets
+                </CardTitle>
+                <CardDescription>
+                  Submit and track your support requests
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Need help? Submit a support ticket and we'll get back to you quickly.
+                </p>
+                <div className="flex gap-2">
+                  <Button asChild className="flex-1">
+                    <Link href="/support-ticket">
+                      <Ticket className="h-4 w-4 mr-2" />
+                      Submit Ticket
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild className="flex-1">
+                    <Link href="/customer/tickets">
+                      <FileText className="h-4 w-4 mr-2" />
+                      My Tickets
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Support Form */}
         <Card>
           <CardHeader>
             <CardTitle>Submit Support Request</CardTitle>
-            <CardDescription>Describe your issue and we'll get back to you as soon as possible</CardDescription>
+            <CardDescription>
+              {user 
+                ? "Describe your issue and we'll get back to you as soon as possible"
+                : "Please log in to submit a support ticket, or use the contact information above"
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" placeholder="John" />
+            {user ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">
+                  Use our ticket system for faster support
+                </p>
+                <Button asChild className="w-full">
+                  <Link href="/support-ticket">
+                    <Ticket className="h-4 w-4 mr-2" />
+                    Submit Support Ticket
+                  </Link>
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" placeholder="Doe" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="john@example.com" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone (Optional)</Label>
-              <Input id="phone" type="tel" placeholder="(555) 123-4567" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input id="subject" placeholder="Brief description of your issue" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea id="message" placeholder="Please describe your issue in detail..." className="min-h-[120px]" />
-            </div>
-            <Button className="w-full">Submit Support Request</Button>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input id="firstName" placeholder="John" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" placeholder="Doe" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="john@example.com" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone (Optional)</Label>
+                  <Input id="phone" type="tel" placeholder="(555) 123-4567" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Subject</Label>
+                  <Input id="subject" placeholder="Brief description of your issue" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea id="message" placeholder="Please describe your issue in detail..." className="min-h-[120px]" />
+                </div>
+                <Button className="w-full">Submit Support Request</Button>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
