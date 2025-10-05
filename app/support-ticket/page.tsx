@@ -25,10 +25,21 @@ export default function SupportTicketPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
+    if (!user) {
+      toast.error("Please log in to submit a ticket")
+      return
+    }
+
+    // Validate required fields
+    if (!formData.subject || !formData.issueType || !formData.description) {
+      toast.error("Please fill in all required fields")
+      return
+    }
 
     setIsSubmitting(true)
     try {
+      console.log("Submitting ticket:", { ...formData, customerName: user.name, customerEmail: user.email })
+      
       const response = await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,14 +50,19 @@ export default function SupportTicketPage() {
         }),
       })
 
+      const data = await response.json()
+      console.log("API Response:", data)
+
       if (response.ok) {
         toast.success("Support ticket submitted successfully!")
         router.push("/customer/tickets")
       } else {
-        toast.error("Failed to submit ticket")
+        console.error("API Error:", data)
+        toast.error(`Failed to submit ticket: ${data.error || 'Unknown error'}`)
       }
     } catch (error) {
-      toast.error("Failed to submit ticket")
+      console.error("Submission error:", error)
+      toast.error("Failed to submit ticket. Please try again.")
     } finally {
       setIsSubmitting(false)
     }

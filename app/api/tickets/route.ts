@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getTicketsCollection } from "@/lib/db"
 import { z } from "zod"
+import { randomUUID } from "crypto"
 
 const createTicketSchema = z.object({
   customerName: z.string().min(1),
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     
     const ticket = {
       ...validatedData,
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       status: "open" as const,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -31,7 +32,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, ticket })
   } catch (error) {
     console.error("Error creating ticket:", error)
-    return NextResponse.json({ error: "Failed to create ticket" }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Failed to create ticket", 
+      details: error instanceof Error ? error.message : "Unknown error" 
+    }, { status: 500 })
   }
 }
 
