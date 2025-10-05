@@ -30,17 +30,22 @@ digraph WebsiteFlow {
         
         CustomerDashboard [label="Customer Dashboard\n/app/customer/home", fillcolor=lightgreen];
         CustomerQuotes [label="My Quotes\n/app/customer/quotes", fillcolor=lightgreen];
+        CustomerTickets [label="My Tickets\n/app/customer/tickets", fillcolor=lightgreen];
         CustomerProfile [label="Profile\n/app/profile", fillcolor=lightgreen];
         GetQuote [label="Get Quote\n/app/quote", fillcolor=lightgreen];
+        SupportTicket [label="Submit Ticket\n/app/support-ticket", fillcolor=lightgreen];
         QuoteForm [label="Quote Form Component", fillcolor=lightcyan];
         QuotationDialog [label="Quotation Dialog", fillcolor=lightcyan];
         
         CustomerDashboard -> CustomerQuotes [label="View Quotes"];
+        CustomerDashboard -> CustomerTickets [label="View Tickets"];
         CustomerDashboard -> GetQuote [label="Request Quote"];
+        CustomerDashboard -> SupportTicket [label="Submit Ticket"];
         CustomerDashboard -> CustomerProfile [label="Profile Settings"];
         GetQuote -> QuoteForm [label="Fill Form"];
         QuoteForm -> QuotationDialog [label="Preview Quote"];
         QuotationDialog -> CustomerQuotes [label="Quote Submitted"];
+        SupportTicket -> CustomerTickets [label="Ticket Submitted"];
     }
     
     subgraph cluster_admin {
@@ -50,10 +55,12 @@ digraph WebsiteFlow {
         
         AdminDashboard [label="Admin Dashboard\n/app/dashboard", fillcolor=lightpink];
         AdminQuotes [label="Manage Quotes\n/app/quotes", fillcolor=lightpink];
+        AdminTickets [label="Support Tickets\n/app/admin/tickets", fillcolor=lightpink];
         Inventory [label="Product Inventory\n/app/inventory", fillcolor=lightpink];
         Analytics [label="Analytics\n/app/analytics", fillcolor=lightpink];
         
         AdminDashboard -> AdminQuotes [label="Manage Quotes"];
+        AdminDashboard -> AdminTickets [label="Manage Tickets"];
         AdminDashboard -> Inventory [label="Manage Products"];
         AdminDashboard -> Analytics [label="View Analytics"];
     }
@@ -87,6 +94,7 @@ digraph WebsiteFlow {
         AuthAPI [label="Authentication API\n/api/auth/*", fillcolor=lightgray];
         ProductsAPI [label="Products API\n/api/products/*", fillcolor=lightgray];
         QuotesAPI [label="Quotes API\n/api/quotes/*", fillcolor=lightgray];
+        TicketsAPI [label="Tickets API\n/api/tickets/*", fillcolor=lightgray];
         
         AuthAPI -> LoginAPI [label="/login"];
         AuthAPI -> RegisterAPI [label="/register"];
@@ -95,6 +103,9 @@ digraph WebsiteFlow {
         QuotesAPI -> CreateQuoteAPI [label="POST /"];
         QuotesAPI -> GetQuotesAPI [label="GET /"];
         QuotesAPI -> UpdateQuoteAPI [label="PUT /[id]"];
+        TicketsAPI -> CreateTicketAPI [label="POST /"];
+        TicketsAPI -> GetTicketsAPI [label="GET /"];
+        TicketsAPI -> UpdateTicketAPI [label="PUT /[id]"];
     }
     
     subgraph cluster_database {
@@ -106,10 +117,12 @@ digraph WebsiteFlow {
         UsersCollection [label="Users Collection", fillcolor=lightsteelblue];
         ProductsCollection [label="Products Collection", fillcolor=lightsteelblue];
         QuotesCollection [label="Quotes Collection", fillcolor=lightsteelblue];
+        TicketsCollection [label="Tickets Collection", fillcolor=lightsteelblue];
         
         MongoDB -> UsersCollection;
         MongoDB -> ProductsCollection;
         MongoDB -> QuotesCollection;
+        MongoDB -> TicketsCollection;
     }
     
     subgraph cluster_components {
@@ -138,6 +151,7 @@ digraph WebsiteFlow {
     AuthAPI -> UsersCollection [label="Store/Verify User"];
     ProductsAPI -> ProductsCollection [label="CRUD Operations"];
     QuotesAPI -> QuotesCollection [label="CRUD Operations"];
+    TicketsAPI -> TicketsCollection [label="CRUD Operations"];
     
     // Navigation flow
     Navigation -> CustomerDashboard [label="Customer Role"];
@@ -148,6 +162,12 @@ digraph WebsiteFlow {
     QuotationDialog -> QuotesAPI [label="Confirm Quote"];
     QuotesAPI -> QuotesCollection [label="Store Quote"];
     
+    // Ticket flow
+    SupportTicket -> TicketsAPI [label="Submit Ticket"];
+    CustomerTickets -> TicketsAPI [label="Fetch Tickets"];
+    AdminTickets -> TicketsAPI [label="Manage Tickets"];
+    TicketsAPI -> TicketsCollection [label="Store/Update Tickets"];
+    
     // Product flow
     Catalog -> ProductsAPI [label="Fetch Products"];
     ProductDetail -> ProductsAPI [label="Fetch Product Details"];
@@ -156,6 +176,7 @@ digraph WebsiteFlow {
     // Analytics flow
     Analytics -> QuotesAPI [label="Fetch Quote Data"];
     Analytics -> ProductsAPI [label="Fetch Product Data"];
+    Analytics -> TicketsAPI [label="Fetch Ticket Data"];
     
     // Styling
     Start [fillcolor=lightgreen];
@@ -163,6 +184,7 @@ digraph WebsiteFlow {
     AuthAPI [fillcolor=lightcoral];
     ProductsAPI [fillcolor=lightcoral];
     QuotesAPI [fillcolor=lightcoral];
+    TicketsAPI [fillcolor=lightcoral];
     
     // Legend
     subgraph cluster_legend {
