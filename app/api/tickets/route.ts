@@ -14,10 +14,15 @@ const createTicketSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("=== TICKET CREATION START ===")
     const body = await request.json()
+    console.log("Request body:", body)
+    
     const validatedData = createTicketSchema.parse(body)
+    console.log("Validated data:", validatedData)
     
     const tickets = await getTicketsCollection()
+    console.log("Got tickets collection")
     
     const ticket = {
       ...validatedData,
@@ -26,15 +31,24 @@ export async function POST(request: NextRequest) {
       createdAt: new Date(),
       updatedAt: new Date(),
     }
+    console.log("Created ticket object:", ticket)
     
-    await tickets.insertOne(ticket)
+    const result = await tickets.insertOne(ticket)
+    console.log("Insert result:", result)
     
-    return NextResponse.json({ success: true, ticket })
+    console.log("=== TICKET CREATION SUCCESS ===")
+    return NextResponse.json({ success: true, ticket, insertId: result.insertedId })
   } catch (error) {
-    console.error("Error creating ticket:", error)
+    console.error("=== TICKET CREATION ERROR ===")
+    console.error("Error type:", typeof error)
+    console.error("Error message:", error instanceof Error ? error.message : "Unknown error")
+    console.error("Error stack:", error instanceof Error ? error.stack : "No stack")
+    console.error("Full error:", error)
+    
     return NextResponse.json({ 
       error: "Failed to create ticket", 
-      details: error instanceof Error ? error.message : "Unknown error" 
+      details: error instanceof Error ? error.message : "Unknown error",
+      type: typeof error
     }, { status: 500 })
   }
 }
