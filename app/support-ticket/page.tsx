@@ -36,6 +36,11 @@ export default function SupportTicketPage() {
       return
     }
 
+    if (formData.description.length < 5) {
+      toast.error("Description must be at least 5 characters long")
+      return
+    }
+
     setIsSubmitting(true)
     try {
       console.log("Submitting ticket:", { ...formData, customerName: user.name, customerEmail: user.email })

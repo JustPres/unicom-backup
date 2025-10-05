@@ -8,7 +8,7 @@ const createTicketSchema = z.object({
   customerEmail: z.string().email(),
   subject: z.string().min(1),
   issueType: z.enum(["technical", "billing", "general", "product", "other"]),
-  description: z.string().min(10),
+  description: z.string().min(5, "Description must be at least 5 characters"),
   priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
 })
 
