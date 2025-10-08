@@ -282,8 +282,10 @@ class CustomNavigationBar extends StatelessWidget {
       return [
         {'route': '/customer/home', 'label': 'Home'},
         {'route': '/catalog', 'label': 'Catalog'},
+        {'route': '/compare', 'label': 'Compare'},
         {'route': '/quote', 'label': 'Get Quote'},
         {'route': '/customer/quotes', 'label': 'My Quotes'},
+        {'route': '/customer/tickets', 'label': 'My Tickets'},
         {'route': '/customer/support', 'label': 'Support'},
         {'route': '/dashboard', 'label': 'Dashboard'},
       ];
@@ -292,6 +294,7 @@ class CustomNavigationBar extends StatelessWidget {
         {'route': '/dashboard', 'label': 'Dashboard'},
         {'route': '/catalog', 'label': 'Catalog'},
         {'route': '/quotes', 'label': 'Quotes'},
+        {'route': '/admin/tickets', 'label': 'Support Tickets'},
         {'route': '/analytics', 'label': 'Analytics'},
         {'route': '/inventory', 'label': 'Inventory'},
       ];

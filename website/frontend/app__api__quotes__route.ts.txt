@@ -1,0 +1,4 @@
+Placeholder for original file: app/api/quotes/route.ts
+Original path: c:\Users\justi\unicom-catalog\app\api\quotes\route.ts
+
+This is a text placeholder; the original file remains in place.

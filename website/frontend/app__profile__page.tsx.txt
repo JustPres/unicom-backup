@@ -1,0 +1,4 @@
+Placeholder for original file: app/profile/page.tsx
+Original path: c:\Users\justi\unicom-catalog\app\profile\page.tsx
+
+This is a text placeholder; the original file remains in place.
