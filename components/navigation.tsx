@@ -48,6 +48,7 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
         { href: "/catalog", label: "Catalog" },
         { href: "/quote", label: "Get Quote" },
         { href: "/customer/quotes", label: "My Quotes" },
+        { href: "/customer/tickets", label: "My Tickets" },
         { href: "/customer/support", label: "Support" },
         { href: "/dashboard", label: "Dashboard" },
       ]
@@ -55,10 +56,10 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
       // Admin navigation
       return [
         { href: "/dashboard", label: "Dashboard" },
-        { href: "/catalog", label: "Catalog" },
+        { href: "/catalog", label: "Products" },
         { href: "/quotes", label: "Quotes" },
-        { href: "/analytics", label: "Analytics" },
         { href: "/inventory", label: "Inventory" },
+        { href: "/admin/tickets", label: "Support Tickets" },
       ]
     }
   }

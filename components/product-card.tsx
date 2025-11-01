@@ -3,7 +3,10 @@ import Link from "next/link"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, ShoppingCart } from "lucide-react"
+import { Star, Share2, Quote } from "lucide-react"
+import { useAuth } from "@/lib/auth"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 import type { Product } from "@/lib/products"
 
 interface ProductCardProps {
@@ -11,6 +14,34 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { user } = useAuth()
+  const router = useRouter()
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      await navigator.share({
+        title: product.name,
+        text: product.description,
+        url: window.location.origin + `/catalog/${product.id}`,
+      })
+    } catch (err) {
+      // Fallback for browsers that don't support Web Share API
+      await navigator.clipboard.writeText(window.location.origin + `/catalog/${product.id}`)
+      toast.success('Link copied to clipboard')
+    }
+  }
+
+  const handleQuote = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (user?.role === 'admin') {
+      toast.info('Admin mode: View only')
+    } else {
+      router.push(`/quote?productId=${product.id}`)
+    }
+  }
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       <div className="relative aspect-square overflow-hidden">
@@ -49,13 +80,23 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 space-y-2">
-        <div className="flex space-x-2 w-full">
-          <Button asChild className="flex-1">
-            <Link href={`/catalog/${product.id}`}>View Details</Link>
+      <CardFooter className="p-4 pt-0">
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1" 
+            onClick={handleQuote}
+          >
+            <Quote className="mr-2 h-4 w-4" />
+            Request Quote
           </Button>
-          <Button size="icon" variant="outline" disabled={!product.inStock} className="shrink-0 bg-transparent">
-            <ShoppingCart className="h-4 w-4" />
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={handleShare}
+          >
+            <Share2 className="h-4 w-4" />
           </Button>
         </div>
       </CardFooter>

@@ -128,6 +128,33 @@ Phase 8 — UI/UX Improvements and Data Integrity
     - Search functionality for both admin and customer views
   - Deploy and verify all improvements are working correctly.
 
+Phase 9 — Support Ticket System Implementation
+- Requirements:
+  - Implement comprehensive support ticket system with MongoDB integration:
+    - Create support ticket data models and interfaces (`lib/tickets.ts`)
+    - Add tickets collection helper to database utilities (`lib/db.ts`)
+  - Build support ticket API endpoints:
+    - POST `/api/tickets` for creating new support tickets
+    - GET `/api/tickets` with customer email and status filtering
+    - PUT `/api/tickets/[id]` for admin ticket updates
+    - GET `/api/tickets/[id]` for individual ticket retrieval
+  - Create customer-facing support ticket interfaces:
+    - Support ticket submission page (`/support-ticket`) with form validation
+    - Customer ticket history page (`/customer/tickets`) with status tracking
+    - Enhanced support page (`/support`) with ticket integration
+  - Build admin support ticket management:
+    - Admin tickets management page (`/admin/tickets`)
+    - Ticket status updates (open → in progress → resolved → closed)
+    - Admin notes and ticket assignment functionality
+  - Update navigation system:
+    - Add "My Tickets" link to customer navigation menu
+    - Add "Support Tickets" link to admin navigation menu
+  - Implement ticket validation and error handling:
+    - Zod schema validation for ticket creation
+    - Client-side form validation with user feedback
+    - Comprehensive error logging and debugging
+  - Deploy and verify complete support ticket workflow functionality.
+
 Notes & Next Candidates (Post-Phase 8)
 - Optional:
   - Add hamburger mobile menu to `VisitorHeader` (Sheet) mirroring authenticated nav.

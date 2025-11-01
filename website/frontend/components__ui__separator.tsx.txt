@@ -1,0 +1,4 @@
+Placeholder for original file: components/ui/separator.tsx
+Original path: c:\Users\justi\unicom-catalog\components\ui\separator.tsx
+
+This is a text placeholder; the original file remains in place.

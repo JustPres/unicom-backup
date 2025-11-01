@@ -1,0 +1,201 @@
+digraph WebsiteFlow {
+    // Graph settings
+    rankdir=TB;
+    node [shape=box, style=filled, fontname="Arial", fontsize=10];
+    edge [fontname="Arial", fontsize=8];
+    
+    // Color scheme
+    subgraph cluster_auth {
+        label="Authentication System";
+        style=filled;
+        color=lightblue;
+        
+        Start [label="User Visits Website", shape=ellipse, fillcolor=lightgreen];
+        AuthCheck [label="Check Authentication Status", fillcolor=lightyellow];
+        LoginPage [label="Login Page\n/app/login", fillcolor=lightcoral];
+        RegisterPage [label="Register Page\n/app/register", fillcolor=lightcoral];
+        AdminLoginPage [label="Admin Login Page\n/app/admin/login", fillcolor=lightcoral];
+        
+        Start -> AuthCheck;
+        AuthCheck -> LoginPage [label="Not Authenticated"];
+        AuthCheck -> Dashboard [label="Authenticated"];
+        LoginPage -> RegisterPage [label="Need Account"];
+        LoginPage -> AdminLoginPage [label="Admin Access"];
+    }
+    
+    subgraph cluster_customer {
+        label="Customer Flow";
+        style=filled;
+        color=lightgreen;
+        
+        CustomerDashboard [label="Customer Dashboard\n/app/customer/home", fillcolor=lightgreen];
+        CustomerQuotes [label="My Quotes\n/app/customer/quotes", fillcolor=lightgreen];
+        CustomerTickets [label="My Tickets\n/app/customer/tickets", fillcolor=lightgreen];
+        CustomerProfile [label="Profile\n/app/profile", fillcolor=lightgreen];
+        GetQuote [label="Get Quote\n/app/quote", fillcolor=lightgreen];
+        SupportTicket [label="Submit Ticket\n/app/support-ticket", fillcolor=lightgreen];
+        QuoteForm [label="Quote Form Component", fillcolor=lightcyan];
+        QuotationDialog [label="Quotation Dialog", fillcolor=lightcyan];
+        
+        CustomerDashboard -> CustomerQuotes [label="View Quotes"];
+        CustomerDashboard -> CustomerTickets [label="View Tickets"];
+        CustomerDashboard -> GetQuote [label="Request Quote"];
+        CustomerDashboard -> SupportTicket [label="Submit Ticket"];
+        CustomerDashboard -> CustomerProfile [label="Profile Settings"];
+        GetQuote -> QuoteForm [label="Fill Form"];
+        QuoteForm -> QuotationDialog [label="Preview Quote"];
+        QuotationDialog -> CustomerQuotes [label="Quote Submitted"];
+        SupportTicket -> CustomerTickets [label="Ticket Submitted"];
+    }
+    
+    subgraph cluster_admin {
+        label="Admin Flow";
+        style=filled;
+        color=lightpink;
+        
+        AdminDashboard [label="Admin Dashboard\n/app/dashboard", fillcolor=lightpink];
+        AdminQuotes [label="Manage Quotes\n/app/quotes", fillcolor=lightpink];
+        AdminTickets [label="Support Tickets\n/app/admin/tickets", fillcolor=lightpink];
+        Inventory [label="Product Inventory\n/app/inventory", fillcolor=lightpink];
+        Analytics [label="Analytics\n/app/analytics", fillcolor=lightpink];
+        
+        AdminDashboard -> AdminQuotes [label="Manage Quotes"];
+        AdminDashboard -> AdminTickets [label="Manage Tickets"];
+        AdminDashboard -> Inventory [label="Manage Products"];
+        AdminDashboard -> Analytics [label="View Analytics"];
+    }
+    
+    subgraph cluster_public {
+        label="Public Pages";
+        style=filled;
+        color=lightyellow;
+        
+        HomePage [label="Home Page\n/app", fillcolor=lightyellow];
+        Catalog [label="Product Catalog\n/app/catalog", fillcolor=lightyellow];
+        ProductDetail [label="Product Detail\n/app/catalog/[id]", fillcolor=lightyellow];
+        Compare [label="Compare Products\n/app/compare", fillcolor=lightyellow];
+        Services [label="Services\n/app/services", fillcolor=lightyellow];
+        Support [label="Support\n/app/support", fillcolor=lightyellow];
+        About [label="About\n/app/about", fillcolor=lightyellow];
+        
+        HomePage -> Catalog [label="Browse Products"];
+        HomePage -> Services [label="Our Services"];
+        HomePage -> Support [label="Get Support"];
+        HomePage -> About [label="About Us"];
+        Catalog -> ProductDetail [label="View Product"];
+        Catalog -> Compare [label="Compare Products"];
+    }
+    
+    subgraph cluster_api {
+        label="API Routes";
+        style=filled;
+        color=lightgray;
+        
+        AuthAPI [label="Authentication API\n/api/auth/*", fillcolor=lightgray];
+        ProductsAPI [label="Products API\n/api/products/*", fillcolor=lightgray];
+        QuotesAPI [label="Quotes API\n/api/quotes/*", fillcolor=lightgray];
+        TicketsAPI [label="Tickets API\n/api/tickets/*", fillcolor=lightgray];
+        
+        AuthAPI -> LoginAPI [label="/login"];
+        AuthAPI -> RegisterAPI [label="/register"];
+        ProductsAPI -> GetProductsAPI [label="GET /"];
+        ProductsAPI -> GetProductAPI [label="GET /[id]"];
+        QuotesAPI -> CreateQuoteAPI [label="POST /"];
+        QuotesAPI -> GetQuotesAPI [label="GET /"];
+        QuotesAPI -> UpdateQuoteAPI [label="PUT /[id]"];
+        TicketsAPI -> CreateTicketAPI [label="POST /"];
+        TicketsAPI -> GetTicketsAPI [label="GET /"];
+        TicketsAPI -> UpdateTicketAPI [label="PUT /[id]"];
+    }
+    
+    subgraph cluster_database {
+        label="Database Layer";
+        style=filled;
+        color=lightsteelblue;
+        
+        MongoDB [label="MongoDB Atlas", shape=cylinder, fillcolor=lightsteelblue];
+        UsersCollection [label="Users Collection", fillcolor=lightsteelblue];
+        ProductsCollection [label="Products Collection", fillcolor=lightsteelblue];
+        QuotesCollection [label="Quotes Collection", fillcolor=lightsteelblue];
+        TicketsCollection [label="Tickets Collection", fillcolor=lightsteelblue];
+        
+        MongoDB -> UsersCollection;
+        MongoDB -> ProductsCollection;
+        MongoDB -> QuotesCollection;
+        MongoDB -> TicketsCollection;
+    }
+    
+    subgraph cluster_components {
+        label="UI Components";
+        style=filled;
+        color=lightcyan;
+        
+        Navigation [label="Navigation Component", fillcolor=lightcyan];
+        ProductCard [label="Product Card", fillcolor=lightcyan];
+        QuoteForm [label="Quote Form", fillcolor=lightcyan];
+        Charts [label="Chart Components", fillcolor=lightcyan];
+        ThemeProvider [label="Theme Provider", fillcolor=lightcyan];
+        
+        Navigation -> CustomerDashboard [label="Customer Nav"];
+        Navigation -> AdminDashboard [label="Admin Nav"];
+        ProductCard -> ProductDetail [label="Click Product"];
+        Charts -> Analytics [label="Display Data"];
+    }
+    
+    // Authentication flow
+    LoginPage -> AuthAPI [label="POST /api/auth/login"];
+    RegisterPage -> AuthAPI [label="POST /api/auth/register"];
+    AdminLoginPage -> AuthAPI [label="POST /api/auth/login"];
+    
+    // Data flow
+    AuthAPI -> UsersCollection [label="Store/Verify User"];
+    ProductsAPI -> ProductsCollection [label="CRUD Operations"];
+    QuotesAPI -> QuotesCollection [label="CRUD Operations"];
+    TicketsAPI -> TicketsCollection [label="CRUD Operations"];
+    
+    // Navigation flow
+    Navigation -> CustomerDashboard [label="Customer Role"];
+    Navigation -> AdminDashboard [label="Admin Role"];
+    
+    // Quote flow
+    QuoteForm -> QuotesAPI [label="Submit Quote"];
+    QuotationDialog -> QuotesAPI [label="Confirm Quote"];
+    QuotesAPI -> QuotesCollection [label="Store Quote"];
+    
+    // Ticket flow
+    SupportTicket -> TicketsAPI [label="Submit Ticket"];
+    CustomerTickets -> TicketsAPI [label="Fetch Tickets"];
+    AdminTickets -> TicketsAPI [label="Manage Tickets"];
+    TicketsAPI -> TicketsCollection [label="Store/Update Tickets"];
+    
+    // Product flow
+    Catalog -> ProductsAPI [label="Fetch Products"];
+    ProductDetail -> ProductsAPI [label="Fetch Product Details"];
+    Inventory -> ProductsAPI [label="Manage Products"];
+    
+    // Analytics flow
+    Analytics -> QuotesAPI [label="Fetch Quote Data"];
+    Analytics -> ProductsAPI [label="Fetch Product Data"];
+    Analytics -> TicketsAPI [label="Fetch Ticket Data"];
+    
+    // Styling
+    Start [fillcolor=lightgreen];
+    MongoDB [fillcolor=lightsteelblue];
+    AuthAPI [fillcolor=lightcoral];
+    ProductsAPI [fillcolor=lightcoral];
+    QuotesAPI [fillcolor=lightcoral];
+    TicketsAPI [fillcolor=lightcoral];
+    
+    // Legend
+    subgraph cluster_legend {
+        label="Legend";
+        style=filled;
+        color=white;
+        
+        LegendPages [label="Pages", fillcolor=lightyellow];
+        LegendAPI [label="API Routes", fillcolor=lightcoral];
+        LegendDB [label="Database", fillcolor=lightsteelblue];
+        LegendComponents [label="Components", fillcolor=lightcyan];
+        LegendAuth [label="Authentication", fillcolor=lightblue];
+    }
+}

@@ -1,0 +1,4 @@
+Placeholder for original file: flutter-web-guide/backend/01-setup-environment.md
+Original path: c:\Users\justi\unicom-catalog\flutter-web-guide\backend\01-setup-environment.md
+
+This is a text placeholder; the original file remains in place.

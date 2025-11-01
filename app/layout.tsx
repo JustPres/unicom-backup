@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { AuthProvider } from "@/lib/auth"
 import { Chatbot } from "@/components/chatbot"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const spaceGrotesk = Space_Grotesk({
@@ -43,6 +44,7 @@ export default function RootLayout({
             {children}
             <Analytics />
             <Chatbot />
+            <Toaster />
           </Suspense>
         </AuthProvider>
       </body>

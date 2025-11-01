@@ -32,3 +32,27 @@ if (uri) {
 
 export default clientPromise
 
+export async function getDb() {
+  const client = await clientPromise
+  return client.db(process.env.MONGODB_DB || "unicom-catalog")
+}
+
+export async function getUsersCollection() {
+  const db = await getDb()
+  return db.collection("users")
+}
+
+export async function getProductsCollection() {
+  const db = await getDb()
+  return db.collection("products")
+}
+
+export async function getQuotesCollection() {
+  const db = await getDb()
+  return db.collection("quotes")
+}
+
+export async function getTicketsCollection() {
+  const db = await getDb()
+  return db.collection("tickets")
+}
