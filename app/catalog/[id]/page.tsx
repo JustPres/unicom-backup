@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Star, ShoppingCart, Heart, Share2, ArrowLeft } from "lucide-react"
+import { Star, Share2, Quote, ArrowLeft } from "lucide-react"
+import { toast } from "sonner"
 import { getProductById, type Product } from "@/lib/products"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth"
+import { useRouter } from "next/navigation"
 
 interface ProductPageProps {
   params: {
@@ -22,6 +24,29 @@ export default function ProductPage({ params }: ProductPageProps) {
   const { user } = useAuth()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: product?.name,
+        text: product?.description,
+        url: window.location.href,
+      })
+    } catch (err) {
+      // Fallback for browsers that don't support Web Share API
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success('Link copied to clipboard')
+    }
+  }
+
+  const handleRequestQuote = () => {
+    if (user?.role === 'admin') {
+      toast.info('Admin mode: View only')
+    } else {
+      router.push(`/quote?productId=${product?.id}`)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -108,15 +133,21 @@ export default function ProductPage({ params }: ProductPageProps) {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-4">
-                <Button size="lg" className="flex-1" disabled={!product.inStock}>
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
+              <div className="flex gap-4">
+                <Button 
+                  size="lg" 
+                  className="flex-1" 
+                  onClick={handleRequestQuote}
+                >
+                  <Quote className="mr-2 h-5 w-5" />
+                  Request Quote
                 </Button>
-                <Button size="lg" variant="outline">
-                  <Heart className="h-5 w-5" />
-                </Button>
-                <Button size="lg" variant="outline">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-11 w-11"
+                  onClick={handleShare}
+                >
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>

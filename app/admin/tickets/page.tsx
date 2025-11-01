@@ -20,9 +20,23 @@ export default function AdminTicketsPage() {
     adminNotes: "",
     assignedTo: "",
   })
+  const [admins, setAdmins] = useState<Array<{ id: string; name: string; email: string }>>([])
 
   useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const response = await fetch('/api/users/admins')
+        if (response.ok) {
+          const data = await response.json()
+          setAdmins(data.users || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch admins:', error)
+      }
+    }
+
     fetchTickets()
+    fetchAdmins()
   }, [])
 
   const fetchTickets = async () => {
@@ -183,12 +197,15 @@ export default function AdminTicketsPage() {
                               onValueChange={(value) => setUpdateData({ ...updateData, assignedTo: value })}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select assignee" />
+                                <SelectValue placeholder="Unassigned" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="admin1">Admin 1</SelectItem>
-                                <SelectItem value="admin2">Admin 2</SelectItem>
-                                <SelectItem value="support">Support Team</SelectItem>
+                                <SelectItem value="unassigned">Unassigned</SelectItem>
+                                {admins.map((admin) => (
+                                  <SelectItem key={admin.id} value={admin.id}>
+                                    {admin.name} ({admin.email})
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>

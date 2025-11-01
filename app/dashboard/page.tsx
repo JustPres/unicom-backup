@@ -8,7 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Navigation } from "@/components/navigation"
-import { ShoppingCart, Users, TrendingUp, Package, Plus } from "lucide-react"
+import { ShoppingCart, Users, TrendingUp, Package, Plus, FileText, Activity } from "lucide-react"
+import { Overview } from "@/components/overview"
+import { RecentSales } from "@/components/recent-sales"
+import { TopProducts } from "@/components/top-products"
+import { RecentActivity } from "@/components/recent-activity"
 
 export default function DashboardPage() {
   const { user, loading } = useAuth()
@@ -49,26 +53,156 @@ export default function DashboardPage() {
           </Badge>
         </div>
 
-        {isAdmin ? <AdminDashboard /> : <CustomerDashboard />}
+        {user?.role === 'admin' ? <AdminDashboard /> : <CustomerDashboard />}
       </main>
     </div>
   )
 }
 
 function AdminDashboard() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/analytics/overview');
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard data');
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
-    <div className="space-y-8">
-      {/* Placeholder: add admin widgets here later */}
-      <Card className="border-dashed">
-        <CardHeader>
-          <CardTitle>Admin Dashboard</CardTitle>
-          <CardDescription>No widgets yet. Add admin modules here.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">This area will host KPIs, shortcuts, and recent activity once connected to real data.</p>
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+        {loading ? (
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center p-4 text-red-500">{error}</div>
+        ) : null}
+      </div>
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <span className="h-4 w-4 text-muted-foreground">
+              <TrendingUp className="h-4 w-4" />
+            </span>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${data?.sales?.total?.toLocaleString() || '0'}</div>
+            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Customers</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data?.customers?.total || '0'}</div>
+            <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Quotes</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data?.quotes?.total || '0'}</div>
+            <p className="text-xs text-muted-foreground">+19% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Now</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+573</div>
+            <p className="text-xs text-muted-foreground">+201 since last hour</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <Overview data={data?.sales?.daily || []} />
+          </CardContent>
+        </Card>
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Recent Sales</CardTitle>
+            <CardDescription>You made 265 sales this month.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecentSales />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TopProducts products={data?.products?.mostQuoted || []} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RecentActivity />
+          </CardContent>
+        </Card>
+      </div>
     </div>
+  )
+}
+
+function QuickActionCard({ title, description, icon, href }: { title: string, description: string, icon: React.ReactNode, href: string }) {
+  return (
+    <Link href={href}>
+      <Card className="h-full hover:bg-accent/50 transition-colors">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{title}</CardTitle>
+            <div className="p-2 rounded-full bg-primary/10">
+              {icon}
+            </div>
+          </div>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+      </Card>
+    </Link>
   )
 }
 

@@ -56,11 +56,10 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
       // Admin navigation
       return [
         { href: "/dashboard", label: "Dashboard" },
-        { href: "/catalog", label: "Catalog" },
+        { href: "/catalog", label: "Products" },
         { href: "/quotes", label: "Quotes" },
-        { href: "/admin/tickets", label: "Support Tickets" },
-        { href: "/analytics", label: "Analytics" },
         { href: "/inventory", label: "Inventory" },
+        { href: "/admin/tickets", label: "Support Tickets" },
       ]
     }
   }
