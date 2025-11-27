@@ -60,7 +60,7 @@ export default function DashboardPage() {
 }
 
 function AdminDashboard() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,7 +97,7 @@ function AdminDashboard() {
           <div className="text-center p-4 text-red-500">{error}</div>
         ) : null}
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -107,7 +107,7 @@ function AdminDashboard() {
             </span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${data?.sales?.total?.toLocaleString() || '0'}</div>
+            <div className="text-2xl font-bold">₱{(data?.sales?.total || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -118,7 +118,7 @@ function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data?.customers?.total || '0'}</div>
+            <div className="text-2xl font-bold">{data?.customers?.total || 0}</div>
             <p className="text-xs text-muted-foreground">+180.1% from last month</p>
           </CardContent>
         </Card>
@@ -129,7 +129,7 @@ function AdminDashboard() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data?.quotes?.total || '0'}</div>
+            <div className="text-2xl font-bold">{data?.quotes?.total || 0}</div>
             <p className="text-xs text-muted-foreground">+19% from last month</p>
           </CardContent>
         </Card>
@@ -258,7 +258,7 @@ function CustomerDashboard() {
                   <div>
                     <p className="font-medium">Quote #{quote.id.slice(0, 8)}</p>
                     <p className="text-sm text-muted-foreground">
-                      {quote.items.length} items • ${quote.totalAmount.toLocaleString()}
+                      {quote.items.length} items • ₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
                   <Badge variant={quote.status === "approved" ? "default" : "secondary"}>

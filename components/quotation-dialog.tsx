@@ -25,6 +25,16 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
     const handleExportPDF = async () => {
         setIsGeneratingPDF(true)
         try {
+            // Convert logo to base64 to embed in PDF
+            const response = await fetch('/unicom_logo.png')
+            const blob = await response.blob()
+            const reader = new FileReader()
+
+            const logoBase64 = await new Promise<string>((resolve) => {
+                reader.onloadend = () => resolve(reader.result as string)
+                reader.readAsDataURL(blob)
+            })
+
             // Create a new window for printing
             const printWindow = window.open('', '_blank')
             if (!printWindow) return
@@ -37,8 +47,9 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
           <style>
             body { font-family: Arial, sans-serif; margin: 40px; }
             .header { text-align: center; margin-bottom: 30px; }
+            .logo { max-width: 200px; height: auto; margin-bottom: 15px; }
             .company { font-size: 24px; font-weight: bold; color: #059669; }
-            .quote-id { font-size: 18px; color: #666; }
+            .quote-id { font-size: 18px; color: #666; margin-top: 10px; }
             .customer-info { margin-bottom: 30px; }
             .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
             .items-table th, .items-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
@@ -49,7 +60,7 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
         </head>
         <body>
           <div class="header">
-            <div class="company">Unicom Technologies</div>
+            <img src="${logoBase64}" alt="Unicom Logo" class="logo" />
             <div class="quote-id">Quotation #${quote.id}</div>
             <p>Your trusted local provider for electronics and IT solutions</p>
           </div>
@@ -85,7 +96,7 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
           </table>
 
           <div class="total">
-            <p>Total Amount: ₱${quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p>Total Amount: ₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
 
           ${quote.notes ? `
@@ -105,7 +116,11 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
 
             printWindow.document.write(printContent)
             printWindow.document.close()
-            printWindow.print()
+
+            // Wait a bit for images to load before printing
+            setTimeout(() => {
+                printWindow.print()
+            }, 500)
         } catch (error) {
             console.error('Error generating PDF:', error)
         } finally {

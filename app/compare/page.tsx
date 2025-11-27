@@ -84,7 +84,7 @@ function CompareContent() {
                 </div>
                 <CardTitle className="text-lg">{product.name}</CardTitle>
                 <div className="flex items-center justify-center space-x-2">
-                  <span className="text-2xl font-bold text-emerald-600">${product.price}</span>
+                  <span className="text-2xl font-bold text-emerald-600">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   <Badge variant={product.inStock ? "default" : "secondary"}>
                     {product.inStock ? "In Stock" : "Out of Stock"}
                   </Badge>

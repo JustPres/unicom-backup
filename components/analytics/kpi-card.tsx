@@ -11,7 +11,7 @@ type KpiCardProps = {
 
 export function KpiCard({ title, value, change, icon, description }: KpiCardProps) {
   const isPositive = change ? change >= 0 : null
-  
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -41,7 +41,7 @@ export function KpiGrid({ data }: { data: any }) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <KpiCard
         title="Total Revenue"
-        value={`$${data?.sales?.total?.toLocaleString() || '0'}`}
+        value={`₱${data?.sales?.total?.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}`}
         change={12.5}
         icon={<DollarSign className="h-4 w-4" />}
       />
