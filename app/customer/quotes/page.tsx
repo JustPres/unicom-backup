@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Eye, CheckCircle, XCircle, Clock, FileText, Plus } from "lucide-react"
 import type { Quote } from "@/lib/quotes"
 import Link from "next/link"
+import { QuotationDialog } from "@/components/quotation-dialog"
 
 export default function CustomerQuotesPage() {
   const { user, loading } = useAuth()
@@ -19,6 +20,8 @@ export default function CustomerQuotesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [quotesLoading, setQuotesLoading] = useState(true)
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "customer")) {
@@ -233,7 +236,14 @@ export default function CustomerQuotesPage() {
                       </TableCell>
                       <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <Button size="sm" variant="outline">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedQuote(quote)
+                            setIsDialogOpen(true)
+                          }}
+                        >
                           <Eye className="h-4 w-4 mr-1" />
                           View
                         </Button>
@@ -246,6 +256,22 @@ export default function CustomerQuotesPage() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Quote Details Dialog */}
+      {selectedQuote && (
+        <QuotationDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          quote={selectedQuote}
+          viewOnly={true}
+          onConfirm={() => {
+            setIsDialogOpen(false)
+          }}
+          onCancel={() => {
+            setIsDialogOpen(false)
+          }}
+        />
+      )}
     </div>
   )
 }

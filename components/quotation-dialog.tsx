@@ -15,9 +15,10 @@ interface QuotationDialogProps {
     quote: Quote | null
     onConfirm: () => void
     onCancel: () => void
+    viewOnly?: boolean
 }
 
-export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel }: QuotationDialogProps) {
+export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel, viewOnly = false }: QuotationDialogProps) {
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
     if (!quote) return null
@@ -96,7 +97,7 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
           </table>
 
           <div class="total">
-            <p>Total Amount: ₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p>Total Amount: ₱${quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
 
           ${quote.notes ? `
@@ -107,7 +108,7 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
           ` : ''}
 
           <div class="footer">
-            <p>This quotation is valid for 30 days from ${quote.createdAt.toLocaleDateString()}</p>
+            <p>This quotation is valid for 30 days from ${new Date(quote.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
             <p>Thank you for choosing Unicom Technologies!</p>
           </div>
         </body>
@@ -240,22 +241,26 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
                             {isGeneratingPDF ? "Generating..." : "Export PDF"}
                         </Button>
 
-                        <Button
-                            variant="destructive"
-                            onClick={onCancel}
-                            className="flex items-center gap-2"
-                        >
-                            <X className="h-4 w-4" />
-                            Cancel Quote
-                        </Button>
+                        {!viewOnly && (
+                            <>
+                                <Button
+                                    variant="destructive"
+                                    onClick={onCancel}
+                                    className="flex items-center gap-2"
+                                >
+                                    <X className="h-4 w-4" />
+                                    Cancel Quote
+                                </Button>
 
-                        <Button
-                            onClick={onConfirm}
-                            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
-                        >
-                            <Send className="h-4 w-4" />
-                            Request Quote
-                        </Button>
+                                <Button
+                                    onClick={onConfirm}
+                                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
+                                >
+                                    <Send className="h-4 w-4" />
+                                    Request Quote
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </DialogContent>

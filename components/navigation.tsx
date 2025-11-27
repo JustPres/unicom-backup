@@ -49,7 +49,6 @@ export function Navigation({ centered = false }: { centered?: boolean }) {
         { href: "/quote", label: "Get Quote" },
         { href: "/customer/quotes", label: "My Quotes" },
         { href: "/customer/tickets", label: "My Tickets" },
-        { href: "/customer/support", label: "Support" },
         { href: "/dashboard", label: "Dashboard" },
       ]
     } else {

@@ -172,6 +172,7 @@ export default function QuotePage() {
           quote={pendingQuote}
           onConfirm={handleConfirmQuote}
           onCancel={handleCancelQuote}
+          viewOnly={false}
         />
       </main>
     </div>

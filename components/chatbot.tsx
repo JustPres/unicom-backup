@@ -129,11 +129,6 @@ export function Chatbot() {
       router.push("/quotes")
       return
     }
-    if (/\bsupport\b|\bhelp\b/.test(lower)) {
-      pushMessage("Taking you to support…", true)
-      router.push("/support")
-      return
-    }
 
     // Call LLM API for everything else
     try {
@@ -293,7 +288,6 @@ export function Chatbot() {
               <div className="mt-2 flex flex-wrap gap-2 text-xs">
                 <Link href="/catalog" className="underline text-muted-foreground hover:text-foreground">Catalog</Link>
                 <Link href="/quote" className="underline text-muted-foreground hover:text-foreground">Get Quote</Link>
-                <Link href="/support" className="underline text-muted-foreground hover:text-foreground">Support</Link>
               </div>
             </div>
           </div>
