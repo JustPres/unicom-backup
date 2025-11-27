@@ -4,9 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { MessageCircle, Send } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { searchProducts, type Product } from "@/lib/products"
-import { getFaqAnswer } from "@/lib/faq"
+import { type Product } from "@/lib/products"
+import { useAuth } from "@/lib/auth"
 import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 
 interface Message {
   id: string
@@ -17,6 +18,15 @@ interface Message {
 }
 
 export function Chatbot() {
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user } = useAuth()
+
+  // Hide chatbot on login pages and all admin pages
+  if (pathname === "/login" || pathname?.startsWith("/admin")) {
+    return null
+  }
+
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -44,29 +54,48 @@ export function Chatbot() {
   // Load persisted chat
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("chatbot_messages")
+      // For authenticated users, use localStorage (persists across sessions)
+      // For guests, use sessionStorage (clears when browser closes)
+      const storage = user ? localStorage : sessionStorage
+      const raw = storage.getItem("chatbot_messages")
       if (raw) {
         const parsed: Message[] = JSON.parse(raw)
         // Revive timestamps
         setMessages(parsed.map((m) => ({ ...m, timestamp: new Date(m.timestamp) })))
       }
-    } catch {}
-  }, [])
+    } catch { }
+  }, [user])
 
   // Persist chat and auto-scroll on change
   useEffect(() => {
     try {
-      localStorage.setItem(
+      const storage = user ? localStorage : sessionStorage
+      storage.setItem(
         "chatbot_messages",
         JSON.stringify(
           messages.map((m) => ({ ...m, timestamp: m.timestamp.toISOString() })),
         ),
       )
-    } catch {}
+    } catch { }
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight
     }
-  }, [messages, typing])
+  }, [messages, typing, user])
+
+  // Clear chat history when user logs out
+  useEffect(() => {
+    if (!user) {
+      // User logged out, clear any previous authenticated chat
+      localStorage.removeItem("chatbot_messages")
+      // Reset to welcome message only if currently has user-specific data
+      setMessages([{
+        id: "1",
+        text: "Hi! I can help you browse the catalog, get a quote, or navigate the site.",
+        isBot: true,
+        timestamp: new Date(),
+      }])
+    }
+  }, [user])
 
   const pushMessage = (text: string, isBot: boolean, products?: Product[]) => {
     setMessages((prev) => [
@@ -79,71 +108,95 @@ export function Chatbot() {
     const input = raw.trim()
     const lower = input.toLowerCase()
 
-    // Navigation intents
+    // Navigation intents (Client-side fast path)
     if (/(^|\b)(dashboard)\b/.test(lower)) {
       pushMessage("Opening dashboard…", true)
-      window.location.href = "/dashboard"
+      router.push("/dashboard")
       return
     }
     if (/\bcatalog\b|\bproducts?\b/.test(lower)) {
       pushMessage("Taking you to the catalog…", true)
-      window.location.href = "/catalog"
+      router.push("/catalog")
       return
     }
     if (/\bquote\b|\bpricing\b|\bquotation\b/.test(lower)) {
       pushMessage("Let’s start a quote request…", true)
-      window.location.href = "/quote"
+      router.push("/quote")
       return
     }
     if (/\bmy quotes\b|\bquotes\b/.test(lower)) {
       pushMessage("Opening your quotes…", true)
-      window.location.href = "/quotes"
+      router.push("/quotes")
       return
     }
     if (/\bsupport\b|\bhelp\b/.test(lower)) {
       pushMessage("Taking you to support…", true)
-      window.location.href = "/support"
+      router.push("/support")
       return
     }
 
-    // Product search: patterns like "search ssd", "find router"
-    const searchMatch = lower.match(/^(search|find)\s+(.+)/)
-    if (searchMatch) {
-      const term = searchMatch[2]
-      const results = (await searchProducts(term)).slice(0, 5)
-      if (results.length === 0) {
-        pushMessage(`No results for "${term}". Try another keyword.`, true)
-      } else {
-        const header = `Top results for "${term}":`
-        pushMessage(header, true, results)
-      }
-      return
-    }
+    // Call LLM API for everything else
+    try {
+      // Prepare history for the API (exclude the current user message which is already in 'input' but not in 'messages' state yet? 
+      // Actually 'messages' state is updated via pushMessage BEFORE this runs? No, pushMessage is called in send() before handleIntent.
+      // So 'messages' includes the latest user message.
 
-    // FAQ knowledge base
-    const faq = getFaqAnswer(input)
-    if (faq) {
-      pushMessage(faq, true)
-      return
-    }
+      // We need to filter out the latest message to avoid duplication if we are sending it separately, 
+      // OR just send the history excluding the very last one if the API expects "history + new message".
+      // My API route expects { message, history }.
 
-    // Default fallback
-    pushMessage(
-      "I can help you navigate the site and do quick lookups. Try: ‘Go to catalog’, ‘I want a quote’, or ‘search router’.",
-      true,
-    )
+      const history = messages.map(m => ({
+        role: m.isBot ? "model" : "user",
+        text: m.text,
+        isBot: m.isBot
+      }))
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: input,
+          history: history,
+          user: user // Send user context for RBAC
+        }),
+      })
+
+      if (!res.ok) throw new Error("API Error")
+
+      const data = await res.json()
+
+      // Add bot response
+      pushMessage(data.text, true, data.products)
+
+    } catch (error) {
+      console.error(error)
+      pushMessage("I'm having trouble connecting right now. Please try again.", true)
+    }
   }
 
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [cooldown])
+
   const send = async () => {
-    if (!input.trim()) return
+    if (!input.trim() || cooldown > 0) return
     const text = input
     setInput("")
+    setCooldown(3) // 3 seconds cooldown
     pushMessage(text, false)
     setTyping(true)
+
+    // Small delay to allow UI to update before heavy API call if needed, 
+    // though not strictly necessary for the cooldown logic itself.
     setTimeout(async () => {
       await handleIntent(text)
       setTyping(false)
-    }, 500)
+    }, 100)
   }
 
   return (
@@ -176,9 +229,8 @@ export function Chatbot() {
                 {messages.map((m) => (
                   <div key={m.id} className={`flex ${m.isBot ? "justify-start" : "justify-end"}`}>
                     <div
-                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${
-                        m.isBot ? "bg-muted text-foreground" : "bg-emerald-600 text-white"
-                      }`}
+                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${m.isBot ? "bg-muted text-foreground" : "bg-emerald-600 text-white"
+                        }`}
                     >
                       <div>{m.text}</div>
                       {m.products && m.products.length > 0 && (
@@ -220,7 +272,7 @@ export function Chatbot() {
               <div className="flex gap-2 items-end">
                 <textarea
                   rows={1}
-                  placeholder="Type a message… (Enter to send, Shift+Enter for new line)"
+                  placeholder={cooldown > 0 ? `Wait ${cooldown}s...` : "Type a message…"}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -229,9 +281,10 @@ export function Chatbot() {
                       void send()
                     }
                   }}
-                  className="flex-1 resize-none rounded-md border bg-background px-3 py-2 text-sm focus:outline-none"
+                  className="flex-1 resize-none rounded-md border bg-background px-3 py-2 text-sm focus:outline-none disabled:opacity-50"
+                  disabled={cooldown > 0}
                 />
-                <Button size="icon" onClick={send} disabled={!input.trim()}>
+                <Button size="icon" onClick={send} disabled={!input.trim() || cooldown > 0}>
                   <Send className="h-4 w-4" />
                 </Button>
               </div>

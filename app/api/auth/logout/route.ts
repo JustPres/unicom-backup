@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server"
 import { NextRequest } from "next/server"
-import { deleteSession } from "@/lib/session"
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get('auth-token')?.value
-    
-    if (token) {
-      await deleteSession(token)
-    }
-
     const response = NextResponse.json({ success: true })
     
     // Clear auth cookies

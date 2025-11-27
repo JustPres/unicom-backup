@@ -17,7 +17,7 @@ export function RecentSales() {
               olivia.martin@email.com
             </p>
           </div>
-          <div className="ml-auto font-medium">+$1,999.00</div>
+          <div className="ml-auto font-medium">+₱{(1999).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
         </div>
       ))}
     </div>

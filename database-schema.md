@@ -27,7 +27,7 @@ Table products {
   description text [note: 'Product description']
   brand string
   category string [note: 'Product category']
-  price number [note: 'Price in USD']
+  price number [note: 'Price in PHP (Philippine Peso)']
   stock_quantity integer [default: 0]
   specifications json [note: 'Product specifications object']
   images array<string> [note: 'Array of image URLs']

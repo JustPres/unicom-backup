@@ -50,12 +50,6 @@ export function AdminLoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-blue-200">
-        <p className="text-sm font-medium mb-2">Demo Admin Credentials:</p>
-        <p className="text-xs">Email: admin@unicom.com</p>
-        <p className="text-xs">Password: admin123</p>
-      </div>
-
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-2 text-red-200">
           <AlertCircle className="w-4 h-4" />

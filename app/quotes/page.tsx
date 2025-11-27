@@ -166,7 +166,7 @@ export default function AdminQuotesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${quotes.reduce((sum, q) => sum + q.totalAmount, 0).toLocaleString()}
+                ₱{quotes.reduce((sum, q) => sum + q.totalAmount, 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </CardContent>
           </Card>
@@ -227,7 +227,7 @@ export default function AdminQuotesPage() {
                       </TableCell>
                       <TableCell>{quote.company || "-"}</TableCell>
                       <TableCell>{quote.items.length} items</TableCell>
-                      <TableCell className="font-medium">${quote.totalAmount.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium">₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(quote.status)} className="capitalize">
                           {getStatusIcon(quote.status)}

@@ -65,7 +65,7 @@ export function AnalyticsDashboard() {
           <TabsTrigger value="revenue">Revenue</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="sales" className="space-y-4">
           <Card>
             <CardHeader>
@@ -101,7 +101,7 @@ export function AnalyticsDashboard() {
                 <CategoryChart />
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Top Products</CardTitle>
@@ -115,11 +115,11 @@ export function AnalyticsDashboard() {
                         <div>
                           <p className="font-medium">{product.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            ${product.price?.toFixed(2)} • {product.sold || 0} sold
+                            ₱{product.price?.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} • {product.sold || 0} sold
                           </p>
                         </div>
                         <div className="text-sm font-medium">
-                          ${(product.price * (product.sold || 0)).toLocaleString()}
+                          ₱{(product.price * (product.sold || 0)).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </div>
                     ))}

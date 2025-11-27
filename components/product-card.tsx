@@ -75,25 +75,25 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
 
           <div className="flex items-center justify-between pt-2">
-            <span className="text-2xl font-bold text-emerald-600">${product.price.toFixed(2)}</span>
+            <span className="text-2xl font-bold text-emerald-600">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
         <div className="flex w-full gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1" 
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
             onClick={handleQuote}
           >
             <Quote className="mr-2 h-4 w-4" />
             Request Quote
           </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
+          <Button
+            variant="outline"
+            size="icon"
             onClick={handleShare}
           >
             <Share2 className="h-4 w-4" />

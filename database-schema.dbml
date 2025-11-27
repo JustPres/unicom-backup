@@ -27,7 +27,7 @@ Table products {
   description text [note: 'Product description']
   brand varchar
   category varchar [note: 'Product category']
-  price decimal [note: 'Price in USD']
+  price decimal [note: 'Price in PHP (Philippine Peso)']
   stock_quantity int [default: 0]
   specifications json [note: 'Product specifications object']
   images varchar[] [note: 'Array of image URLs']

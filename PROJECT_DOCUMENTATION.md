@@ -51,8 +51,7 @@ Unicom Technologies is a modern e-commerce platform for computer hardware and te
 - `/api/auth/*` - Authentication endpoints
   - `login` - User login
   - `register` - New user registration
-  - `me` - Get current user session
-  - `logout` - Invalidate session
+  - `logout` - Clear authentication cookies
 
 - `/api/products/*` - Product management
   - `GET /` - List all products
@@ -117,7 +116,6 @@ Unicom Technologies is a modern e-commerce platform for computer hardware and te
 
 ### User Authentication
 - Email/password registration and login
-- JWT-based session management
 - Role-based access control (customer/admin)
 - Protected routes
 - Password reset flow

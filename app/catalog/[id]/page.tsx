@@ -125,7 +125,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                 <p className="text-lg text-muted-foreground mb-6">{product.description}</p>
 
                 <div className="flex items-center space-x-4 mb-6">
-                  <span className="text-4xl font-bold text-emerald-600">${product.price.toFixed(2)}</span>
+                  <span className="text-4xl font-bold text-emerald-600">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   <Badge variant={product.inStock ? "default" : "destructive"}>
                     {product.inStock ? "In Stock" : "Out of Stock"}
                   </Badge>
@@ -134,17 +134,17 @@ export default function ProductPage({ params }: ProductPageProps) {
 
               {/* Actions */}
               <div className="flex gap-4">
-                <Button 
-                  size="lg" 
-                  className="flex-1" 
+                <Button
+                  size="lg"
+                  className="flex-1"
                   onClick={handleRequestQuote}
                 >
                   <Quote className="mr-2 h-5 w-5" />
                   Request Quote
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   className="h-11 w-11"
                   onClick={handleShare}
                 >

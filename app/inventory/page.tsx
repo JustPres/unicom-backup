@@ -332,7 +332,7 @@ export default function InventoryPage() {
                     </TableCell>
                     <TableCell>{product.brand}</TableCell>
                     <TableCell className="capitalize">{product.category}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
+                    <TableCell>₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell>
                       <Badge variant={product.inStock ? "default" : "destructive"}>
                         {product.inStock ? "In Stock" : "Out of Stock"}

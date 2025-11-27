@@ -236,17 +236,18 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
                   <div className="space-y-2">
                     <Label>Unit Price</Label>
                     <Input
-                      type="number"
-                      step="0.01"
-                      value={item.unitPrice}
-                      onChange={(e) => updateItem(index, "unitPrice", Number.parseFloat(e.target.value) || 0)}
+                      type="text"
+                      value={`₱${item.unitPrice.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      disabled
+                      className="bg-muted text-muted-foreground cursor-not-allowed"
+                      title="Price is automatically set from the product catalog"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>Subtotal</Label>
                     <div className="p-2 bg-muted rounded-md font-medium">
-                      ${(item.quantity * item.unitPrice).toFixed(2)}
+                      ₱{(item.quantity * item.unitPrice).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                   </div>
                 </div>
@@ -268,7 +269,7 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total Amount:</span>
-                <span className="text-emerald-600">${calculateTotal().toFixed(2)}</span>
+                <span className="text-emerald-600">₱{calculateTotal().toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </>
           )}

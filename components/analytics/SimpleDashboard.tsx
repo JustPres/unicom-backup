@@ -66,7 +66,7 @@ interface SimpleDashboardProps {
 
 export function SimpleDashboard({ data }: SimpleDashboardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false)
-  
+
   // Log the data structure for debugging
   useEffect(() => {
     if (data) {
@@ -112,11 +112,11 @@ export function SimpleDashboard({ data }: SimpleDashboardProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <span className="h-4 w-4 text-muted-foreground">$</span>
+            <span className="h-4 w-4 text-muted-foreground">₱</span>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${sales.total.toLocaleString()}
+              ₱{sales.total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground">
               {sales.orderCount} total orders
@@ -184,7 +184,7 @@ export function SimpleDashboard({ data }: SimpleDashboardProps) {
                   <div>
                     <p className="font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      ${product.price?.toFixed(2) || 'Price not set'}
+                      ₱{product.price?.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || 'Price not set'}
                     </p>
                   </div>
                   <div className="text-right">
@@ -193,7 +193,7 @@ export function SimpleDashboard({ data }: SimpleDashboardProps) {
                     </p>
                     {product.totalQuotedValue !== undefined && (
                       <p className="text-sm text-muted-foreground">
-                        ${product.totalQuotedValue.toLocaleString()} total quoted
+                        ₱{product.totalQuotedValue.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total quoted
                       </p>
                     )}
                   </div>

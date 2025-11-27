@@ -77,15 +77,15 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
                 <tr>
                   <td>${item.productName}</td>
                   <td>${item.quantity}</td>
-                  <td>$${item.unitPrice.toFixed(2)}</td>
-                  <td>$${(item.quantity * item.unitPrice).toFixed(2)}</td>
+                  <td>₱${item.unitPrice.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>₱${(item.quantity * item.unitPrice).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
 
           <div class="total">
-            <p>Total Amount: $${quote.totalAmount.toFixed(2)}</p>
+            <p>Total Amount: ₱${quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
 
           ${quote.notes ? `
@@ -166,17 +166,17 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
                                     <div key={index} className="border rounded-lg p-4">
                                         <div className="flex justify-between items-start mb-2">
                                             <h4 className="font-medium">{item.productName}</h4>
-                                            <Badge variant="outline">${item.unitPrice.toFixed(2)} each</Badge>
+                                            <Badge variant="outline">₱{item.unitPrice.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} each</Badge>
                                         </div>
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
                                             <div>
                                                 <span className="font-medium">Quantity:</span> {item.quantity}
                                             </div>
                                             <div>
-                                                <span className="font-medium">Unit Price:</span> ${item.unitPrice.toFixed(2)}
+                                                <span className="font-medium">Unit Price:</span> ₱{item.unitPrice.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </div>
                                             <div>
-                                                <span className="font-medium">Subtotal:</span> ${(item.quantity * item.unitPrice).toFixed(2)}
+                                                <span className="font-medium">Subtotal:</span> ₱{(item.quantity * item.unitPrice).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </div>
                                             {item.customSpecs && (
                                                 <div className="col-span-2 md:col-span-4">
@@ -194,7 +194,7 @@ export function QuotationDialog({ open, onOpenChange, quote, onConfirm, onCancel
                     <div className="space-y-4">
                         <div className="text-right">
                             <div className="text-2xl font-bold text-emerald-600">
-                                Total: ${quote.totalAmount.toFixed(2)}
+                                Total: ₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
                             <p className="text-sm text-muted-foreground">Valid for 30 days</p>
                         </div>
