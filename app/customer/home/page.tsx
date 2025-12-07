@@ -48,22 +48,6 @@ export default function CustomerHomePage() {
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-balance mb-4">Welcome to Your Electronics Hub</h1>
           <p className="text-lg text-muted-foreground mb-6">Discover the latest in technology and IT solutions</p>
-
-          {/* Quick Search */}
-          <div className="max-w-md mx-auto relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && searchQuery) {
-                  window.location.href = `/catalog?search=${encodeURIComponent(searchQuery)}`
-                }
-              }}
-            />
-          </div>
         </div>
 
         {/* Quick Actions */}
@@ -102,7 +86,7 @@ export default function CustomerHomePage() {
             <CardContent className="text-center">
               <p className="text-muted-foreground mb-4">Track your quote requests</p>
               <Button asChild className="w-full">
-                <Link href="/quotes">View Quotes</Link>
+                <Link href="/customer/quotes">View Quotes</Link>
               </Button>
             </CardContent>
           </Card>

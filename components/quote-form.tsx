@@ -93,7 +93,7 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
     e.preventDefault()
 
     // Validate form
-    if (items.length === 0 || !customerInfo.name || !customerInfo.email) {
+    if (items.length === 0 || !customerInfo.name || !customerInfo.email || !customerInfo.phone) {
       return
     }
 
@@ -160,11 +160,14 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">Phone *</Label>
               <Input
                 id="phone"
+                type="tel"
                 value={customerInfo.phone}
                 onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                required
+                placeholder="Enter your phone number for SMS updates"
               />
             </div>
           </div>
@@ -221,6 +224,22 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
                         </option>
                       ))}
                     </select>
+                    {/* Product Image Preview */}
+                    {item.productId && (() => {
+                      const selectedProduct = products.find(p => p.id === item.productId)
+                      return selectedProduct?.image ? (
+                        <div className="mt-2 p-2 border rounded-md bg-gray-50">
+                          <img
+                            src={selectedProduct.image}
+                            alt={selectedProduct.name}
+                            className="w-full h-24 object-contain rounded"
+                          />
+                          <p className="text-xs text-center text-muted-foreground mt-1">
+                            {selectedProduct.name}
+                          </p>
+                        </div>
+                      ) : null
+                    })()}
                   </div>
 
                   <div className="space-y-2">
@@ -297,7 +316,7 @@ export function QuoteForm({ onSubmit }: QuoteFormProps) {
         <Button
           type="submit"
           size="lg"
-          disabled={items.length === 0 || !customerInfo.name || !customerInfo.email}
+          disabled={items.length === 0 || !customerInfo.name || !customerInfo.email || !customerInfo.phone}
         >
           <Send className="mr-2 h-4 w-4" />
           Request Quote

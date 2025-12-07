@@ -128,38 +128,6 @@ export default function QuotePage() {
           </p>
         </div>
 
-        {/* Services Offered */}
-        <div className="mb-12">
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-xl font-semibold mb-6 text-center">Services Offered</h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <div className="text-center p-4">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Calculator className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <h4 className="font-medium mb-2">Custom Solutions</h4>
-                  <p className="text-sm text-muted-foreground">Tailored technology solutions for your business needs</p>
-                </div>
-                <div className="text-center p-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Clock className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <h4 className="font-medium mb-2">Installation Services</h4>
-                  <p className="text-sm text-muted-foreground">Professional setup and configuration of your equipment</p>
-                </div>
-                <div className="text-center p-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <h4 className="font-medium mb-2">Technical Support</h4>
-                  <p className="text-sm text-muted-foreground">Ongoing maintenance and troubleshooting assistance</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Quote Form */}
         <div className="max-w-4xl mx-auto">
           <QuoteForm onSubmit={handleQuoteSubmit} />

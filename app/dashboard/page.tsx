@@ -63,6 +63,9 @@ function AdminDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [recentQuotes, setRecentQuotes] = useState<any[]>([]);
+  const [recentTickets, setRecentTickets] = useState<any[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -81,21 +84,90 @@ function AdminDashboard() {
     }
   };
 
+  const fetchDataQuiet = async () => {
+    try {
+      const response = await fetch('/api/analytics/overview');
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard data');
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    }
+  };
+
+  const fetchRecentQuotes = async () => {
+    try {
+      const response = await fetch('/api/quotes');
+      if (response.ok) {
+        const result = await response.json();
+        setRecentQuotes(result.quotes || []);
+      }
+    } catch (err) {
+      console.error('Error fetching quotes:', err);
+    }
+  };
+
+  const fetchRecentTickets = async () => {
+    try {
+      const response = await fetch('/api/tickets');
+      if (response.ok) {
+        const result = await response.json();
+        setRecentTickets(result.tickets || []);
+      }
+    } catch (err) {
+      console.error('Error fetching tickets:', err);
+    }
+  };
+
+  const refreshAll = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([fetchDataQuiet(), fetchRecentQuotes(), fetchRecentTickets()]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchRecentQuotes();
+    fetchRecentTickets();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchDataQuiet();
+      fetchRecentQuotes();
+      fetchRecentTickets();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
+
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        {loading ? (
-          <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center p-4 text-red-500">{error}</div>
-        ) : null}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshAll}
+            disabled={isRefreshing}
+          >
+            <Activity className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+          </Button>
+          {loading ? (
+            <div className="flex items-center justify-center p-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600"></div>
+            </div>
+          ) : error ? (
+            <div className="text-sm text-red-500">{error}</div>
+          ) : null}
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -108,7 +180,7 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₱{(data?.sales?.total || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <p className="text-xs text-muted-foreground">{data?.sales?.orderCount || 0} orders</p>
           </CardContent>
         </Card>
 
@@ -119,7 +191,7 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data?.customers?.total || 0}</div>
-            <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+            <p className="text-xs text-muted-foreground">Total registered customers</p>
           </CardContent>
         </Card>
 
@@ -130,18 +202,18 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data?.quotes?.total || 0}</div>
-            <p className="text-xs text-muted-foreground">+19% from last month</p>
+            <p className="text-xs text-muted-foreground">{data?.quotes?.byStatus?.pending || 0} pending approval</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Products</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">+201 since last hour</p>
+            <div className="text-2xl font-bold">{data?.products?.mostQuoted?.length || 0}</div>
+            <p className="text-xs text-muted-foreground">Most quoted products</p>
           </CardContent>
         </Card>
       </div>
@@ -149,19 +221,20 @@ function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
+            <CardTitle>Activity Overview</CardTitle>
+            <CardDescription>Quotes, customer registrations, and support tickets over the last 30 days</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <Overview data={data?.sales?.daily || []} />
+            <Overview data={{ quotes: data?.quotes, customers: data?.customers, tickets: data?.tickets }} />
           </CardContent>
         </Card>
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
-            <CardDescription>You made 265 sales this month.</CardDescription>
+            <CardTitle>Recent Quotation Activity</CardTitle>
+            <CardDescription>Recent quote requests</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecentSales />
+            <RecentSales sales={recentQuotes} />
           </CardContent>
         </Card>
       </div>
@@ -180,7 +253,14 @@ function AdminDashboard() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <RecentActivity />
+            <RecentActivity activities={recentTickets.map(ticket => ({
+              id: ticket.id,
+              type: 'ticket' as const,
+              title: ticket.subject,
+              description: `From ${ticket.customerEmail}`,
+              time: new Date(ticket.createdAt).toLocaleDateString(),
+              status: ticket.status
+            }))} />
           </CardContent>
         </Card>
       </div>

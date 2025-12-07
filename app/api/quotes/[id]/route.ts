@@ -38,7 +38,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
     try {
         const body = await request.json()
-        const { status, adminNotes } = body
+        const { status, adminNotes, rejectionReason } = body
 
         const client = await clientPromise!
         const db = client.db(process.env.MONGODB_DB || "unicom")
@@ -47,6 +47,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         const updateData: any = {}
         if (status) updateData.status = status
         if (adminNotes !== undefined) updateData.adminNotes = adminNotes
+        if (rejectionReason !== undefined) updateData.rejectionReason = rejectionReason
 
         const result = await quotes.updateOne({ id: params.id }, { $set: updateData })
         if (result.matchedCount === 0) {

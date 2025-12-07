@@ -20,6 +20,7 @@ export interface Quote {
   createdAt: Date
   expiresAt: Date
   adminNotes?: string
+  rejectionReason?: string
 }
 
 export const quotes: Quote[] = []

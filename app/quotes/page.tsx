@@ -12,6 +12,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Eye, CheckCircle, XCircle, Clock, FileText, Plus } from "lucide-react"
 import type { Quote } from "@/lib/quotes"
 import Link from "next/link"
+import { QuotationDialog } from "@/components/quotation-dialog"
+import { RejectQuoteDialog } from "@/components/reject-quote-dialog"
 
 export default function AdminQuotesPage() {
   const { user, loading } = useAuth()
@@ -19,6 +21,10 @@ export default function AdminQuotesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [quotesLoading, setQuotesLoading] = useState(true)
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false)
+  const [quoteToReject, setQuoteToReject] = useState<Quote | null>(null)
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "admin")) {
@@ -82,12 +88,17 @@ export default function AdminQuotesPage() {
     }
   }
 
-  const updateQuoteStatus = async (quoteId: string, status: Quote["status"]) => {
+  const updateQuoteStatus = async (quoteId: string, status: Quote["status"], rejectionReason?: string) => {
     try {
+      const body: any = { status }
+      if (rejectionReason) {
+        body.rejectionReason = rejectionReason
+      }
+
       const response = await fetch(`/api/quotes/${quoteId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(body),
       })
 
       if (response.ok) {
@@ -95,6 +106,19 @@ export default function AdminQuotesPage() {
       }
     } catch (error) {
       console.error("Error updating quote status:", error)
+    }
+  }
+
+  const handleRejectClick = (quote: Quote) => {
+    setQuoteToReject(quote)
+    setIsRejectDialogOpen(true)
+  }
+
+  const handleRejectConfirm = async (reason: string) => {
+    if (quoteToReject) {
+      await updateQuoteStatus(quoteToReject.id, "rejected", reason)
+      setIsRejectDialogOpen(false)
+      setQuoteToReject(null)
     }
   }
 
@@ -237,7 +261,14 @@ export default function AdminQuotesPage() {
                       <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedQuote(quote)
+                              setIsViewDialogOpen(true)
+                            }}
+                          >
                             <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
@@ -255,7 +286,7 @@ export default function AdminQuotesPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => updateQuoteStatus(quote.id, "rejected")}
+                                onClick={() => handleRejectClick(quote)}
                                 className="text-red-600 hover:text-red-700"
                               >
                                 <XCircle className="h-4 w-4 mr-1" />
@@ -273,6 +304,24 @@ export default function AdminQuotesPage() {
           </CardContent>
         </Card>
       </main>
+
+      {/* View Quote Dialog */}
+      <QuotationDialog
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        quote={selectedQuote}
+        viewOnly={true}
+        onConfirm={() => { }}
+        onCancel={() => { }}
+      />
+
+      {/* Reject Quote Dialog */}
+      <RejectQuoteDialog
+        open={isRejectDialogOpen}
+        onOpenChange={setIsRejectDialogOpen}
+        onConfirm={handleRejectConfirm}
+        quoteName={quoteToReject?.customerName}
+      />
     </div>
   )
 }

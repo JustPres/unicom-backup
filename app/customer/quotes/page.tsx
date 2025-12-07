@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Eye, CheckCircle, XCircle, Clock, FileText, Plus } from "lucide-react"
+import { Search, Eye, CheckCircle, XCircle, Clock, FileText, Plus, AlertCircle } from "lucide-react"
 import type { Quote } from "@/lib/quotes"
 import Link from "next/link"
 import { QuotationDialog } from "@/components/quotation-dialog"
@@ -223,32 +223,47 @@ export default function CustomerQuotesPage() {
                 </TableHeader>
                 <TableBody>
                   {filteredQuotes.map((quote) => (
-                    <TableRow key={quote.id}>
-                      <TableCell className="font-medium">{quote.id}</TableCell>
-                      <TableCell>{quote.company || "-"}</TableCell>
-                      <TableCell>{quote.items.length} items</TableCell>
-                      <TableCell className="font-medium">₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(quote.status)} className="capitalize">
-                          {getStatusIcon(quote.status)}
-                          <span className="ml-1">{quote.status}</span>
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedQuote(quote)
-                            setIsDialogOpen(true)
-                          }}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                    <>
+                      <TableRow key={quote.id}>
+                        <TableCell className="font-medium">{quote.id}</TableCell>
+                        <TableCell>{quote.company || "-"}</TableCell>
+                        <TableCell>{quote.items.length} items</TableCell>
+                        <TableCell className="font-medium">₱{quote.totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusVariant(quote.status)} className="capitalize">
+                            {getStatusIcon(quote.status)}
+                            <span className="ml-1">{quote.status}</span>
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedQuote(quote)
+                              setIsDialogOpen(true)
+                            }}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      {quote.status === "rejected" && quote.rejectionReason && (
+                        <TableRow key={`${quote.id}-reason`} className="bg-red-50 hover:bg-red-50">
+                          <TableCell colSpan={7}>
+                            <div className="flex items-start gap-2 p-2">
+                              <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm font-semibold text-red-900">Rejection Reason:</p>
+                                <p className="text-sm text-red-700">{quote.rejectionReason}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
                   ))}
                 </TableBody>
               </Table>

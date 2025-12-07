@@ -24,7 +24,8 @@ export async function POST(request: Request) {
             email: string;
             name: string;
             password_hash: string;
-            role: "admin" | "customer"
+            role: "admin" | "customer";
+            email_verified?: boolean;
         }>({ email })
 
         if (!user) {
@@ -36,6 +37,18 @@ export async function POST(request: Request) {
         if (!isPasswordValid) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
         }
+
+        // Check if email is verified
+        if (user.email_verified === false) {
+            return NextResponse.json(
+                {
+                    error: "Please verify your email before logging in. Check your inbox for the verification link.",
+                    code: "EMAIL_NOT_VERIFIED"
+                },
+                { status: 403 }
+            )
+        }
+
 
         // Return user data without the password hash
         const { password_hash, ...userWithoutPassword } = user as any

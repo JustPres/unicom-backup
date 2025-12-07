@@ -63,11 +63,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">{product.brand}</span>
-            <div className="flex items-center space-x-1">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviews})</span>
-            </div>
           </div>
 
           <h3 className="font-semibold text-balance leading-tight line-clamp-2">{product.name}</h3>

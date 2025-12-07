@@ -20,10 +20,10 @@ interface Message {
 export function Chatbot() {
   const pathname = usePathname()
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
 
-  // Hide chatbot on login pages and all admin pages
-  if (pathname === "/login" || pathname?.startsWith("/admin")) {
+  // Hide chatbot on login/register pages, for admin users, and during auth loading
+  if (pathname?.includes("/login") || pathname?.includes("/register") || user?.role === "admin" || loading) {
     return null
   }
 
@@ -108,29 +108,15 @@ export function Chatbot() {
     const input = raw.trim()
     const lower = input.toLowerCase()
 
-    // Navigation intents (Client-side fast path)
-    if (/(^|\b)(dashboard)\b/.test(lower)) {
+    // Only keep very specific navigation intents that are unlikely to appear in regular conversation
+    // Let the AI handle most navigation through natural conversation
+    if (/(^|\s)(open dashboard|go to dashboard|dashboard page)($|\s)/.test(lower)) {
       pushMessage("Opening dashboard…", true)
       router.push("/dashboard")
       return
     }
-    if (/\bcatalog\b|\bproducts?\b/.test(lower)) {
-      pushMessage("Taking you to the catalog…", true)
-      router.push("/catalog")
-      return
-    }
-    if (/\bquote\b|\bpricing\b|\bquotation\b/.test(lower)) {
-      pushMessage("Let’s start a quote request…", true)
-      router.push("/quote")
-      return
-    }
-    if (/\bmy quotes\b|\bquotes\b/.test(lower)) {
-      pushMessage("Opening your quotes…", true)
-      router.push("/quotes")
-      return
-    }
 
-    // Call LLM API for everything else
+    // Call LLM API for everything else - let AI decide if it's navigation or conversation
     try {
       // Prepare history for the API (exclude the current user message which is already in 'input' but not in 'messages' state yet? 
       // Actually 'messages' state is updated via pushMessage BEFORE this runs? No, pushMessage is called in send() before handleIntent.
@@ -229,16 +215,44 @@ export function Chatbot() {
                     >
                       <div>{m.text}</div>
                       {m.products && m.products.length > 0 && (
-                        <div className="mt-2 grid grid-cols-1 gap-2">
+                        <div className="mt-3 space-y-2">
                           {m.products.map((p) => (
-                            <div key={p.id} className="border rounded-md p-2 bg-background">
-                              <div className="text-sm font-medium">{p.name}</div>
-                              <div className="text-xs text-muted-foreground">{p.brand}</div>
-                              <div className="text-xs mt-1">{p.inStock ? "In stock" : "Out of stock"}</div>
-                              <div className="mt-2">
-                                <Link href={`/catalog`} className="text-emerald-600 text-xs underline">View in catalog</Link>
+                            <Link
+                              key={p.id}
+                              href={`/catalog`}
+                              className="block border rounded-lg p-3 bg-background hover:bg-accent transition-colors"
+                            >
+                              <div className="flex gap-3">
+                                {/* Product Image */}
+                                {p.image && (
+                                  <div className="flex-shrink-0 w-16 h-16 rounded overflow-hidden bg-muted">
+                                    <img
+                                      src={p.image}
+                                      alt={p.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                )}
+
+                                {/* Product Info */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-sm text-foreground line-clamp-1">{p.name}</div>
+                                  <div className="text-xs text-muted-foreground">{p.brand}</div>
+
+                                  <div className="flex items-center justify-between mt-1">
+                                    <div className="font-semibold text-emerald-600">
+                                      ₱{p.price?.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || 'N/A'}
+                                    </div>
+                                    <div className={`text-xs px-2 py-0.5 rounded-full ${p.inStock
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : 'bg-red-100 text-red-700'
+                                      }`}>
+                                      {p.inStock ? '✓ In Stock' : 'Out of Stock'}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
+                            </Link>
                           ))}
                         </div>
                       )}

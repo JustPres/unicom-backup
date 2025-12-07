@@ -1,25 +1,40 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-export function RecentSales() {
+export function RecentSales({ sales }: { sales?: any[] }) {
+  if (!sales || sales.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+        No recent sales data available
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex items-center">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={`/avatars/0${i}.png`} alt="Avatar" />
-            <AvatarFallback>OM</AvatarFallback>
-          </Avatar>
-          <div className="ml-4 space-y-1">
-            <p className="text-sm font-medium leading-none">Olivia Martin</p>
-            <p className="text-sm text-muted-foreground">
-              olivia.martin@email.com
-            </p>
+      {sales.slice(0, 5).map((sale, i) => {
+        const initials = sale.customerName
+          ?.split(' ')
+          .map((n: string) => n[0])
+          .join('')
+          .toUpperCase() || 'US'
+
+        return (
+          <div key={sale.id || i} className="flex items-center">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+            <div className="ml-4 space-y-1">
+              <p className="text-sm font-medium leading-none">{sale.customerName || 'Unknown'}</p>
+              <p className="text-sm text-muted-foreground">
+                {sale.customerEmail || 'No email'}
+              </p>
+            </div>
+            <div className="ml-auto font-medium">+₱{(sale.totalAmount || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           </div>
-          <div className="ml-auto font-medium">+₱{(1999).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
