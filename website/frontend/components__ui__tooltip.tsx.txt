@@ -1,4 +1,0 @@
-Placeholder for original file: components/ui/tooltip.tsx
-Original path: c:\Users\justi\unicom-catalog\components\ui\tooltip.tsx
-
-This is a text placeholder; the original file remains in place.

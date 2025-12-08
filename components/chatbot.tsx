@@ -51,12 +51,26 @@ export function Chatbot() {
     [],
   )
 
-  // Load persisted chat
+  // Get today's date as string for comparison
+  const getTodayString = () => new Date().toDateString()
+
+  // Load persisted chat with daily reset
   useEffect(() => {
     try {
       // For authenticated users, use localStorage (persists across sessions)
       // For guests, use sessionStorage (clears when browser closes)
       const storage = user ? localStorage : sessionStorage
+      const storedDate = storage.getItem("chatbot_date")
+      const today = getTodayString()
+
+      // Check if it's a new day - reset chat if so
+      if (storedDate !== today) {
+        storage.removeItem("chatbot_messages")
+        storage.setItem("chatbot_date", today)
+        // Keep default welcome message
+        return
+      }
+
       const raw = storage.getItem("chatbot_messages")
       if (raw) {
         const parsed: Message[] = JSON.parse(raw)
@@ -76,6 +90,8 @@ export function Chatbot() {
           messages.map((m) => ({ ...m, timestamp: m.timestamp.toISOString() })),
         ),
       )
+      // Also update the date to keep it current
+      storage.setItem("chatbot_date", getTodayString())
     } catch { }
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight
@@ -87,6 +103,7 @@ export function Chatbot() {
     if (!user) {
       // User logged out, clear any previous authenticated chat
       localStorage.removeItem("chatbot_messages")
+      localStorage.removeItem("chatbot_date")
       // Reset to welcome message only if currently has user-specific data
       setMessages([{
         id: "1",
@@ -126,7 +143,8 @@ export function Chatbot() {
       // OR just send the history excluding the very last one if the API expects "history + new message".
       // My API route expects { message, history }.
 
-      const history = messages.map(m => ({
+      // Limit history to last 10 messages to prevent context bloat and repetition
+      const history = messages.slice(-10).map(m => ({
         role: m.isBot ? "model" : "user",
         text: m.text,
         isBot: m.isBot

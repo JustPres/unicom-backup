@@ -1,4 +1,0 @@
-Placeholder for original file: flutter-web-guide/backend/README.md
-Original path: c:\Users\justi\unicom-catalog\flutter-web-guide\backend\README.md
-
-This is a text placeholder; the original file remains in place.

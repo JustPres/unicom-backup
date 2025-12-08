@@ -1,4 +1,0 @@
-Placeholder for original file: flutter-web-guide/backend/03-dependencies.md
-Original path: c:\Users\justi\unicom-catalog\flutter-web-guide\backend\03-dependencies.md
-
-This is a text placeholder; the original file remains in place.

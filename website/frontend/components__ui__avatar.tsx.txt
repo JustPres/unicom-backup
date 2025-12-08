@@ -1,4 +1,0 @@
-Placeholder for original file: components/ui/avatar.tsx
-Original path: c:\Users\justi\unicom-catalog\components\ui\avatar.tsx
-
-This is a text placeholder; the original file remains in place.
