@@ -26,14 +26,22 @@ function getTransporter() {
 }
 
 export async function sendVerificationEmail({ email, name, token }: SendVerificationEmailParams) {
+  // Trim and normalize email to prevent whitespace issues
+  const cleanEmail = email.trim().toLowerCase()
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const verificationUrl = `${appUrl}/verify-email?token=${token}`
+
+  console.log(`[Email] Sending verification email:`, {
+    to: cleanEmail,
+    domain: cleanEmail.split('@')[1] || 'N/A',
+    name,
+  })
 
   try {
     const transporter = getTransporter()
     const info = await transporter.sendMail({
       from: `"Unicom Technologies" <${process.env.GMAIL_USER}>`,
-      to: email,
+      to: cleanEmail,
       subject: 'Verify your Unicom Technologies account',
       html: `
 <!DOCTYPE html>

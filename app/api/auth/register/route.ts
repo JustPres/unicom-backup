@@ -5,9 +5,9 @@ import clientPromise from "@/lib/db"
 import { sendVerificationEmail } from "@/lib/email"
 
 const RegisterSchema = z.object({
-    email: z.string().email(),
+    email: z.string().trim().toLowerCase().email(),
     password: z.string().min(6),
-    name: z.string().min(1),
+    name: z.string().min(1).trim(),
     role: z.enum(["admin", "customer"]).optional().default("customer"),
 })
 
@@ -50,17 +50,31 @@ export async function POST(request: Request) {
 
         // Send verification email
         try {
+            console.log(`Attempting to send verification email to: "${email}" (length: ${email.length})`);
             await sendVerificationEmail({
                 email,
                 name,
                 token: verificationToken,
             })
-        } catch (emailError) {
-            console.error("Failed to send verification email:", emailError)
+            console.log(`✓ Verification email sent successfully to: ${email}`);
+        } catch (emailError: any) {
+            console.error("Failed to send verification email:", {
+                email,
+                error: emailError.message,
+                response: emailError.response,
+                responseCode: emailError.responseCode,
+                command: emailError.command,
+            })
             // Delete the user if email sending fails to prevent orphaned accounts
             await users.deleteOne({ id })
+
+            // Return more specific error message
+            const errorMsg = emailError.responseCode === 550
+                ? `The email address "${email}" does not exist or cannot receive emails. Please check the address and try again.`
+                : "Failed to send verification email. Please try again."
+
             return NextResponse.json(
-                { error: "Failed to send verification email. Please try again." },
+                { error: errorMsg },
                 { status: 500 }
             )
         }
